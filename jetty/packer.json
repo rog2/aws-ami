@@ -1,0 +1,47 @@
+{
+  "description": "Java RESTful web app instance using Jetty, Fluentd and AWS CodeDeploy.\nThe default source_ami is fluentd-ubuntu-14.04-20150806 (ami-b91fbdd2).\nPlease note this template does not try to install Fluentd so make sure it has been installed in source_ami.",
+  "variables": {
+    "source_ami": "ami-b91fbdd2",
+    "ami_name": "jetty-ubuntu-14.04-{{isotime \"20060102\"}}",
+    "iam_instance_profile": "packer-ec2"
+  },
+  "builders": [{
+    "type": "amazon-ebs",
+    "region": "us-east-1",
+    "source_ami": "{{user `source_ami`}}",
+    "ami_name": "{{user `ami_name`}}",
+    "ami_description": "Java RESTful web app instance using Jetty, Fluentd and AWS CodeDeploy.",
+    "instance_type": "t2.micro",
+    "iam_instance_profile": "{{user `iam_instance_profile`}}",
+    "ssh_username": "ubuntu",
+    "tags": {
+      "Name": "{{user `ami_name`}}",
+      "OS": "Ubuntu Server",
+      "OS Version": "14.04 LTS",
+      "Base AMI": "{{user `source_ami`}}",
+      "Jetty Version": "9.3.8.v20160314"
+    }
+  }],
+  "provisioners": [{
+    "type": "shell",
+    "inline": ["sleep 10"]
+  }, {
+    "type": "shell",
+    "script": "codedeploy.sh",
+    "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }}"
+  }, {
+    "type": "shell",
+    "script": "jetty.sh"
+  }, {
+    "type": "shell",
+    "inline": [
+      "echo 'Validating provisioners...'",
+      "type java",
+      "java -version",
+      "sudo service jetty status",
+      "sudo service codedeploy-agent status",
+      "echo 'Remove ssh key to make the AMI more secure.'",
+      "rm -vf ~/.ssh/authorized_keys"
+    ]
+  }]
+}
