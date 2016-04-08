@@ -5,19 +5,24 @@
 #
 # Depends on AWS CLI has been installed.
 
+REGION=$1
+
 CODEDEPLOY_TMP='/tmp/install-codedeploy'
-BUCKET_NAME='aws-codedeploy-us-east-1'
-INSTALL_SCRIPT_URL="https://s3.amazonaws.com/$BUCKET_NAME/latest/install"
+BUCKET_NAME="aws-codedeploy-$REGION"
+INSTALL_SCRIPT_URL="s3://$BUCKET_NAME/latest/install"
 
 { service codedeploy-agent status; } && {
     echo "CodeDeploy Agent is already installed. Skip reinstalling it."
     exit 0
 }
 
+sudo apt-get update
+sudo apt-get -y install ruby2.0
+
 echo 'Installing CodeDeploy agent ...'
 
 mkdir -p $CODEDEPLOY_TMP && cd $CODEDEPLOY_TMP
 
-wget $INSTALL_SCRIPT_URL
+aws s3 cp $INSTALL_SCRIPT_URL . --region $REGION
 chmod +x ./install
-./install auto
+sudo ./install auto
