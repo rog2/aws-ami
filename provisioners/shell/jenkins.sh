@@ -44,9 +44,6 @@ echo 'Installing jenkins by apt-get ...'
 apt-get -y update
 apt-get -y install jenkins
 
-# Install necessary packages
-apt-get -y install git maven
-
 # Install Jenkins plugins
 unzip /usr/share/jenkins/jenkins.war WEB-INF/jenkins-cli.jar -d /tmp/jenkins-war
 cp -v /tmp/jenkins-war/WEB-INF/jenkins-cli.jar ~/
