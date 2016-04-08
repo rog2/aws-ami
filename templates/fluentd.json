@@ -2,7 +2,7 @@
   "description": "Fluentd Aggregator with s3 and elasticsearch plugins.\nThe default source_ami is base-ami-ubuntu-14.04-20150806 (ami-1d11b376)",
   "variables": {
     "region": "us-east-1",
-    "source_ami": "ami-1d11b376",
+    "source_ami": null,
     "ami_name": "fluentd-ubuntu-14.04-{{isotime \"20060102\"}}",
     "iam_instance_profile": "packer-ec2"
   },
