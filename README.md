@@ -6,10 +6,15 @@ The OS is **Ubuntu Server 14.04.4 LTS**.
 
 ## Prerequisites
 
-Create an **AWS IAM Role** with name `packer-ec2`.
+Create an **AWS IAM Role** with name `packer-ec2` and attach managed policy **AmazonS3ReadOnlyAccess**.
 
-Attach managed policy **AmazonS3ReadOnlyAccess**.
+Configure the **EC2 Instance Profile** if you are running packer on EC2. Otherwise configure `~/.aws/credentials` on your machine.
 
 ## Run
 
-    packer build -var 'key1=value1' -var 'key2=value2' templates/[name].json
+```shell
+packer build \
+    -var 'region=[region]' \
+    -var 'source_ami=[source_ami]' \
+    templates/[name].json
+```
