@@ -1,9 +1,9 @@
 {
-  "description": "Java RESTful web app instance using Jetty, Fluentd and AWS CodeDeploy.\nThe default source_ami is fluentd-ubuntu-14.04-20150806 (ami-b91fbdd2).\nPlease note this template does not try to install Fluentd so make sure it has been installed in source_ami.",
+  "description": "This is a packer template for building an AMI that other AMIs based on.\nThe default source_ami is ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-20150731 (ami-4dfb5d26)",
   "variables": {
     "region": "us-east-1",
-    "source_ami": "ami-b91fbdd2",
-    "ami_name": "jetty-ubuntu-14.04-{{isotime \"20060102\"}}",
+    "source_ami": null,
+    "ami_name": "base-ubuntu-14.04-{{isotime \"20060102\"}}",
     "iam_instance_profile": "packer-ec2"
   },
   "builders": [{
@@ -11,7 +11,7 @@
     "region": "{{user `region`}}",
     "source_ami": "{{user `source_ami`}}",
     "ami_name": "{{user `ami_name`}}",
-    "ami_description": "Java RESTful web app instance using Jetty, Fluentd and AWS CodeDeploy.",
+    "ami_description": "The AMI that other AMIs based on.",
     "instance_type": "t2.micro",
     "iam_instance_profile": "{{user `iam_instance_profile`}}",
     "ssh_username": "ubuntu",
@@ -19,8 +19,7 @@
       "Name": "{{user `ami_name`}}",
       "OS": "Ubuntu Server",
       "OS Version": "14.04 LTS",
-      "Base AMI": "{{user `source_ami`}}",
-      "Jetty Version": "9.3.8.v20160314"
+      "Base AMI": "{{user `source_ami`}}"
     }
   }],
   "provisioners": [{
@@ -28,22 +27,24 @@
     "inline": ["sleep 10"]
   }, {
     "type": "shell",
-    "script": "codedeploy.sh",
-    "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }} {{user `region`}}"
+    "script": "provisioners/shell/packages.sh"
   }, {
     "type": "shell",
-    "script": "jetty.sh"
+    "script": "provisioners/shell/awscli.sh"
   }, {
     "type": "shell",
-    "script": "fluentd.sh"
+    "script": "provisioners/shell/git.sh"
+  }, {
+    "type": "shell",
+    "script": "provisioners/shell/java8-oracle.sh"
   }, {
     "type": "shell",
     "inline": [
       "echo 'Validating provisioners...'",
-      "type java",
+      "sudo service ntp status",
+      "aws --version",
+      "git --version",
       "java -version",
-      "sudo service jetty status",
-      "sudo service codedeploy-agent status",
       "echo 'Remove ssh key to make the AMI more secure.'",
       "rm -vf ~/.ssh/authorized_keys"
     ]

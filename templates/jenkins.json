@@ -2,7 +2,7 @@
   "description": "Setup a Jenkins CI server with Nginx as reverse proxy.\nThe default source_ami is base-ami-ubuntu-14.04-20150806 (ami-1d11b376)",
   "variables": {
     "region": "us-east-1",
-    "source_ami": "ami-1d11b376",
+    "source_ami": null,
     "ami_name": "jenkins-ubuntu-14.04-{{isotime \"20060102\"}}",
     "iam_instance_profile": "packer-ec2"
   },
@@ -30,15 +30,15 @@
     ]
   }, {
     "type": "shell",
-    "script": "jenkins.sh",
+    "script": "provisioners/shell/jenkins.sh",
     "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }}"
   }, {
     "type": "shell",
-    "script": "nginx.sh",
+    "script": "provisioners/shell/nginx.sh",
     "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }}"
   }, {
     "type": "file",
-    "source": "nginx",
+    "source": "conf/nginx",
     "destination": "/tmp"
   }, {
     "type": "shell",

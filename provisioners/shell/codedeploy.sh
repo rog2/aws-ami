@@ -16,9 +16,6 @@ INSTALL_SCRIPT_URL="s3://$BUCKET_NAME/latest/install"
     exit 0
 }
 
-sudo apt-get update
-sudo apt-get -y install ruby2.0
-
 echo 'Installing CodeDeploy agent ...'
 
 mkdir -p $CODEDEPLOY_TMP && cd $CODEDEPLOY_TMP

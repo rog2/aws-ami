@@ -2,7 +2,7 @@
   "description": "Installs mono.\nThe default source_ami is base-ami-ubuntu-14.04-20150806 (ami-1d11b376)",
   "variables": {
     "region": "us-east-1",
-    "source_ami": "ami-1d11b376",
+    "source_ami": null,
     "ami_name": "mono-ubuntu-14.04-{{isotime \"20060102\"}}",
     "iam_instance_profile": "packer-ec2"
   },
@@ -28,7 +28,7 @@
     "inline": ["sleep 10"]
   }, {
     "type": "shell",
-    "script": "mono.sh"
+    "script": "provisioners/shell/mono.sh"
   }, {
     "type": "shell",
     "inline": [
