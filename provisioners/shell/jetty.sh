@@ -4,6 +4,7 @@
 # Install Jetty on Ubuntu Server, and configure it to be a daemon service.
 #
 
+JETTY_VERSION='9.3.8.v20160314'
 JETTY_DEFAULT_LOCATION="/opt/jetty"
 
 # Jetty Installation Directory Parameter
@@ -19,8 +20,6 @@ JETTY_HOME="$JETTY_LOCATION/home"
 JETTY_BASE="$JETTY_LOCATION/base"
 JETTY_DIST="$JETTY_LOCATION/dist"
 JETTY_TEMP="$JETTY_LOCATION/temp"
-
-JETTY_VERSION='9.3.8.v20160314'
 
 JETTY_DIST_TAR_FILENAME="jetty-distribution-$JETTY_VERSION.tar.gz"
 JETTY_DIST_UNPACKED_DIRNAME="jetty-distribution-$JETTY_VERSION"

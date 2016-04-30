@@ -5,11 +5,12 @@
 #
 # Depends on AWS CLI has been installed.
 
-REGION=$1
-
 CODEDEPLOY_TMP='/tmp/install-codedeploy'
-BUCKET_NAME="aws-codedeploy-$REGION"
-INSTALL_SCRIPT_URL="s3://$BUCKET_NAME/latest/install"
+
+region=$1
+
+bucket_name="aws-codedeploy-$region"
+install_script_url="s3://$bucket_name/latest/install"
 
 { service codedeploy-agent status; } && {
     echo "CodeDeploy Agent is already installed. Skip reinstalling it."
@@ -20,6 +21,6 @@ echo 'Installing CodeDeploy agent ...'
 
 mkdir -p $CODEDEPLOY_TMP && cd $CODEDEPLOY_TMP
 
-aws s3 cp $INSTALL_SCRIPT_URL . --region $REGION
+aws s3 cp $install_script_url . --region $region
 chmod +x ./install
 sudo ./install auto

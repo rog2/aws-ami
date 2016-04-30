@@ -20,11 +20,11 @@ DEPS="
     "
 
 # Install basic packages
-for DEP in $DEPS; do
-    if ! dpkg -s $DEP > /dev/null 2>&1; then
-    echo "Attempting installation of missing package: $DEP"
+for dep in $DEPS; do
+    if ! dpkg -s $dep > /dev/null 2>&1; then
+    echo "Attempting installation of missing package: $dep"
     set -x
-    sudo apt-get install -y $DEP
+    sudo apt-get install -y $dep
     set +x
     fi
 done
