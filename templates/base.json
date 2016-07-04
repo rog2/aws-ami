@@ -4,7 +4,8 @@
     "region": "us-east-1",
     "source_ami": null,
     "ami_name": "base-ubuntu-14.04-{{isotime \"20060102\"}}",
-    "iam_instance_profile": "packer-ec2"
+    "iam_instance_profile": "packer-ec2",
+    "tag_os_version": "14.04 LTS"
   },
   "builders": [{
     "type": "amazon-ebs",
@@ -18,7 +19,7 @@
     "tags": {
       "Name": "{{user `ami_name`}}",
       "OS": "Ubuntu Server",
-      "OS Version": "14.04 LTS",
+      "OS Version": "{{user `tag_os_version`}}",
       "Base AMI": "{{user `source_ami`}}"
     }
   }],

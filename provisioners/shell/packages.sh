@@ -5,6 +5,7 @@ set -e
 # Do software and security update
 sudo apt-get update && sudo apt-get upgrade -y
 
+# Common packages across all versions
 DEPS="
     apt-show-versions
     ntp
@@ -16,8 +17,23 @@ DEPS="
     tree
     jq
     aria2
+    "
+
+# Version specific packages
+DEPS_TRUSTY="
     ruby2.0
     "
+DEPS_XENIAL="
+    ruby2.3
+    "
+
+CODENAME=$(lsb_release -s -c)
+
+if [ "$CODENAME" = "xenial" ]; then
+    DEPS="$DEPS $DEPS_XENIAL"
+else
+    DEPS="$DEPS $DEPS_TRUSTY"
+fi
 
 # Install basic packages
 for dep in $DEPS; do
