@@ -8,5 +8,5 @@ API_URL_OLD=$(grep $API_URL $SALTPAD_CONF)
 API_URL_NEW="  $API_URL:\"$PUBLIC_IPV4:8686\","
 
 if [ -n "$API_URL_OLD=" ]; then
-        sed -i "s/$API_URL_OLD/$API_URL_NEW/" $SALTPAD_CONF
+    sed -i "s/$API_URL_OLD/$API_URL_NEW/" $SALTPAD_CONF
 fi
