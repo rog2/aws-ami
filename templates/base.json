@@ -3,7 +3,7 @@
   "variables": {
     "region": "us-east-1",
     "source_ami": null,
-    "salt_master": "salt",
+    "salt_master_addr": "salt",
     "ami_name": "base-ubuntu-14.04-{{isotime \"20060102\"}}",
     "iam_instance_profile": "packer-ec2",
     "tag_os_version": "14.04 LTS"
@@ -48,7 +48,7 @@
   }, {
     "type": "shell",
     "script": "provisioners/shell/salt-minion.sh",
-    "execute_command": "{{ .Vars }} {{ .Path }} {{user `salt_master`}}"
+    "execute_command": "{{ .Vars }} {{ .Path }} {{user `salt_master_addr`}}"
   }, {
     "type": "shell",
     "inline": [
