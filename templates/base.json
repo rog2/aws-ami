@@ -3,7 +3,6 @@
   "variables": {
     "region": "us-east-1",
     "source_ami": null,
-    "salt_master_addr": "salt",
     "ami_name": "base-ubuntu-14.04-{{isotime \"20060102\"}}",
     "iam_instance_profile": "packer-ec2",
     "tag_os_version": "14.04 LTS"
@@ -47,17 +46,12 @@
     "script": "provisioners/shell/journald-conf.sh"
   }, {
     "type": "shell",
-    "script": "provisioners/shell/salt-minion.sh",
-    "execute_command": "{{ .Vars }} {{ .Path }} {{user `salt_master_addr`}}"
-  }, {
-    "type": "shell",
     "inline": [
       "echo 'Validating provisioners...'",
       "sudo service ntp status",
       "aws --version",
       "git --version",
       "java -version",
-      "salt-minion --version",
       "echo 'Remove ssh key to make the AMI more secure.'",
       "rm -vf ~/.ssh/authorized_keys"
     ]
