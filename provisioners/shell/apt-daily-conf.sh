@@ -1,5 +1,9 @@
 #!/bin/bash -ex
 
-sudo mkdir -p /etc/systemd/system/apt-daily.timer.d
-echo "[Timer]"$'\n'"Persistent=false" | sudo tee /etc/systemd/system/apt-daily.timer.d/persistent.conf
-echo "[Timer]"$'\n'"OnBootSec=1h" | sudo tee /etc/systemd/system/apt-daily.timer.d/delay.conf
+conf_path=/etc/systemd/system/apt-daily.timer.d
+conf_file="$conf_path"'/startup.conf'
+
+sudo mkdir -p "$conf_path"
+echo "[Timer]" | sudo tee "$conf_file"
+echo "Persistent=false" | sudo tee "$conf_file" -a
+echo "OnBootSec=1h" | sudo tee "$conf_file" -a
