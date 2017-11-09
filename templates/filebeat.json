@@ -3,7 +3,7 @@
   "variables": {
     "region": "us-east-1",
     "source_ami": null,
-    "ami_name": "filebeat-ubuntu-14.04-{{isotime \"20060102\"}}",
+    "ami_name": "filebeat-ubuntu-16.04-{{isotime \"20060102\"}}",
     "iam_instance_profile": "packer-ec2"
   },
   "builders": [{
@@ -11,14 +11,14 @@
     "region": "{{user `region`}}",
     "source_ami": "{{user `source_ami`}}",
     "ami_name": "{{user `ami_name`}}",
-    "ami_description": "Filebeat",
+    "ami_description": "Filebeat installed bases on base ami",
     "instance_type": "t2.micro",
     "iam_instance_profile": "{{user `iam_instance_profile`}}",
     "ssh_username": "ubuntu",
     "tags": {
       "Name": "{{user `ami_name`}}",
       "OS": "Ubuntu Server",
-      "OS Version": "14.04 LTS",
+      "OS Version": "16.04 LTS",
       "Base AMI": "{{user `source_ami`}}"
     }
   }],
