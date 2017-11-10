@@ -1,0 +1,48 @@
+{
+    "description": "ElasticSearch, Logstash and Kibana 5.x with x-pack",
+    "variables": {
+      "region": "us-east-1",
+      "source_ami": null,
+      "ami_name": "elk-ubuntu-16.04-{{isotime \"20171110\"}}",
+      "iam_instance_profile": "packer-ec2"
+    },
+    "builders": [{
+      "type": "amazon-ebs",
+      "region": "{{user `region`}}",
+      "source_ami": "{{user `source_ami`}}",
+      "ami_name": "{{user `ami_name`}}",
+      "ami_description": "ELK 5.x with x-pack",
+      "instance_type": "t2.micro",
+      "iam_instance_profile": "{{user `iam_instance_profile`}}",
+      "ssh_username": "ubuntu",
+      "tags": {
+        "Name": "{{user `ami_name`}}",
+        "OS": "Ubuntu Server",
+        "OS Version": "16.04 LTS",
+        "Base AMI": "{{user `source_ami`}}"
+      }
+    }],
+    "provisioners": [{
+      "type": "shell",
+      "inline": ["sleep 10"]
+    }, {
+      "type": "shell",
+      "script": "provisioners/shell/elastic/apt-init.sh"
+    }, {
+      "type": "shell",
+      "script": "provisioners/shell/elastic/elasticsearch.sh"
+    }, {
+      "type": "shell",
+      "script": "provisioners/shell/elastic/kibana.sh"
+    }, {
+      "type": "shell",
+      "script": "provisioners/shell/elastic/logstash.sh"
+    }, {
+      "type": "shell",
+      "inline": [
+        "echo 'Remove ssh key to make the AMI more secure.'",
+        "rm -vf ~/.ssh/authorized_keys"
+      ]
+    }]
+  }
+  

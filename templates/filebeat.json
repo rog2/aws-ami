@@ -27,7 +27,10 @@
     "inline": ["sleep 10"]
   }, {
     "type": "shell",
-    "script": "provisioners/shell/filebeat.sh"
+    "script": "provisioners/shell/elastic/apt-init.sh"
+  }, {
+    "type": "shell",
+    "script": "provisioners/shell/elastic/filebeat.sh"
   }, {
     "type": "shell",
     "inline": [
