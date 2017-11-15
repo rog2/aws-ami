@@ -1,8 +1,5 @@
 #!/bin/bash -ex
 
-MASTER_ADDR=$1
-MASTER_CONFIG_FILE=/etc/salt/minion.d/master.conf
-
 SALT_REPO_CONFIG_FILE=/etc/apt/sources.list.d/saltstack.list
 
 # echo 'Installing salt ...'
@@ -28,5 +25,6 @@ sudo apt-get update
 # curl -o bootstrap-salt.sh -L https://bootstrap.saltstack.com
 # sudo sh bootstrap-salt.sh git develop
 sudo apt-get install salt-minion -y
-sudo touch "$MASTER_CONFIG_FILE"
-echo "master: $MASTER_ADDR" | sudo tee "$MASTER_CONFIG_FILE"
+
+# disable salt-minion by default
+sudo systemctl disable salt-minion.service

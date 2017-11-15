@@ -49,12 +49,16 @@
     "script": "provisioners/shell/apt-daily-conf.sh"
   }, {
     "type": "shell",
+    "script": "provisioners/shell/salt-minion.sh"
+  },{
+    "type": "shell",
     "inline": [
       "echo 'Validating provisioners...'",
       "sudo service ntp status",
       "aws --version",
       "git --version",
       "java -version",
+      "salt-minion --version",
       "echo 'Remove ssh key to make the AMI more secure.'",
       "rm -vf ~/.ssh/authorized_keys"
     ]
