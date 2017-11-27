@@ -11,7 +11,7 @@
       "region": "{{user `region`}}",
       "source_ami": "{{user `source_ami`}}",
       "ami_name": "{{user `ami_name`}}",
-      "ami_description": "ELK 6.x with x-pack",
+      "ami_description": "ELK 6.x with nginx",
       "instance_type": "t2.medium",
       "iam_instance_profile": "{{user `iam_instance_profile`}}",
       "ssh_username": "ubuntu",
@@ -39,7 +39,8 @@
       "script": "provisioners/shell/elastic/logstash.sh"
     }, {
       "type": "shell",
-      "script": "provisioners/shell/nginx.sh"
+      "script": "provisioners/shell/nginx.sh",
+      "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }}"
     }, {
       "type": "shell",
       "inline": [

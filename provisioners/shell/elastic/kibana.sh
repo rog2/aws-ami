@@ -9,7 +9,7 @@ fi
 echo "Installing kibana"
 sudo apt-get install -y kibana
 
-sudo /usr/share/kibana/bin/kibana-plugin install x-pack
+#sudo /usr/share/kibana/bin/kibana-plugin install x-pack
 
 sudo systemctl start kibana
 sudo systemctl enable kibana

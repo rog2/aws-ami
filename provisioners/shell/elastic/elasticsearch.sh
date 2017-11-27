@@ -9,7 +9,7 @@ fi
 echo "Installing elasticsearch"
 sudo apt-get install -y elasticsearch
 
-sudo /usr/share/elasticsearch/bin/elasticsearch-plugin install x-pack
+#sudo /usr/share/elasticsearch/bin/elasticsearch-plugin install x-pack
 
 sudo systemctl start elasticsearch
 sudo systemctl enable elasticsearch
