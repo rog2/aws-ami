@@ -18,7 +18,7 @@ fi
 mkdir -p $TMP_DIR && cd $TMP_DIR
 
 echo 'Adding nginx signing key ...'
-wget -q -O - http://nginx.org/keys/nginx_signing.key | sudo apt-key add -
+wget -q -O - http://nginx.org/keys/nginx_signing.key | apt-key add -
 
 echo 'Adding nginx repository to apt source list ...'
 echo '# nginx repository' >> $APT_SOURCE_FILE
@@ -26,5 +26,5 @@ echo "deb http://nginx.org/packages/ubuntu/ $CODENAME nginx" >> "$APT_SOURCE_FIL
 echo "deb-src http://nginx.org/packages/ubuntu/ $CODENAME nginx" >> "$APT_SOURCE_FILE"
 
 echo 'Installing nginx by apt-get ...'
-sudo apt-get -y update
-sudo apt-get -y install nginx
+apt-get -y update
+apt-get -y install nginx
