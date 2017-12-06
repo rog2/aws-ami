@@ -28,3 +28,5 @@ sudo apt-get install salt-minion -y
 
 # disable salt-minion by default
 sudo systemctl disable salt-minion.service
+
+sudo rm -f /etc/salt/minion_id

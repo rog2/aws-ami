@@ -52,6 +52,12 @@
     "script": "provisioners/shell/salt-minion.sh"
   },{
     "type": "shell",
+    "script": "provisioners/shell/core-conf.sh"
+  },{
+    "type": "shell",
+    "script": "provisioners/shell/time.sh"
+  },{
+    "type": "shell",
     "inline": [
       "echo 'Validating provisioners...'",
       "sudo service ntp status",
@@ -60,6 +66,8 @@
       "java -version",
       "salt-minion --version",
       "echo 'Remove ssh key to make the AMI more secure.'",
+      "cat /proc/sys/kernel/core_pattern",
+      "date",
       "rm -vf ~/.ssh/authorized_keys"
     ]
   }]

@@ -8,7 +8,6 @@ sudo apt-get update
 # Common packages across all versions
 DEPS="
     apt-show-versions
-    ntp
     unzip
     unrar
     htop
