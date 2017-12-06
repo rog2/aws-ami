@@ -72,8 +72,6 @@
       "java -version",
       "salt-minion --version",
       "echo 'Remove ssh key to make the AMI more secure.'",
-      "cat /proc/sys/kernel/core_pattern",
-      "date",
       "rm -vf ~/.ssh/authorized_keys"
     ]
   }]
