@@ -2,20 +2,13 @@
 
 # needs run as root.
 
-timezone=$1
-
-echo "Set timezone..."
-timedatectl set-timezone $timezone
-
-timedatectl status
-
 echo "Install Amazon Time Sync Service..."
 # http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/set-time.html
 apt install chrony -y
 
 echo "Configuring Amazon Time Sync Service..."
-CONF_FILE=/etc/chrony.conf
-TEMP_FILE=/etc/chrony.conf.tmp
+CONF_FILE=/etc/chrony/chrony.conf
+TEMP_FILE=/etc/chrony/chrony.conf.tmp
 
 tac $CONF_FILE > $TEMP_FILE
 sed -i '0,/^\(server\|pool\).*/s/^\(server\|pool\).*/server 169.254.169.123 prefer iburst\n&/' $TEMP_FILE

@@ -57,8 +57,12 @@
     "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }}"
   },{
     "type": "shell",
-    "script": "provisioners/shell/time.sh",
+    "script": "provisioners/shell/timezone.sh",
     "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }} {{user `timezone`}}"
+  },{
+    "type": "shell",
+    "script": "provisioners/shell/chrony.sh",
+    "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }}"
   },{
     "type": "shell",
     "inline": [
