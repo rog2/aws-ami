@@ -19,5 +19,7 @@ echo "Restarting Amazon Time Sync Service..."
 /etc/init.d/chrony restart
 
 echo "Verifying Amazon Time Sync Service..."
+# waiting until source being determined
+sleep 10
 chronyc tracking |grep 169.254.169.123 &> /dev/null
 echo "ok"
