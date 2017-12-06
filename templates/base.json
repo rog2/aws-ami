@@ -67,7 +67,6 @@
     "type": "shell",
     "inline": [
       "echo 'Validating provisioners...'",
-      "sudo service ntp status",
       "aws --version",
       "git --version",
       "java -version",
