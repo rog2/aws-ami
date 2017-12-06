@@ -4,6 +4,7 @@
     "region": "us-east-1",
     "source_ami": null,
     "ami_name": "base-ubuntu-14.04-{{isotime \"20060102\"}}",
+    "timezone": "Asia/Shanghai",
     "iam_instance_profile": "packer-ec2",
     "tag_os_version": "14.04 LTS"
   },
@@ -52,10 +53,12 @@
     "script": "provisioners/shell/salt-minion.sh"
   },{
     "type": "shell",
-    "script": "provisioners/shell/core-conf.sh"
+    "script": "provisioners/shell/core-conf.sh",
+    "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }}"
   },{
     "type": "shell",
-    "script": "provisioners/shell/time.sh"
+    "script": "provisioners/shell/time.sh",
+    "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }} {{user `timezone`}}"
   },{
     "type": "shell",
     "inline": [
