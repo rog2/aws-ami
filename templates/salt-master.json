@@ -35,7 +35,7 @@
     "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }}"
   }, {
     "type": "shell",
-    "script": "provisioners/shell/salt-master.sh",
+    "script": "provisioners/shell/salt-master-1404.sh",
     "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }}"
   }, {
     "type": "file",
