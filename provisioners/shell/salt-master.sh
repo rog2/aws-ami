@@ -1,40 +1,33 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
-#
-# Install salt master on Ubuntu Server, and configure it to be a daemon service.
-#
-SALTPAD_LOCATION=/data/www
+# https://repo.saltstack.com/#ubuntu
 
-SALT_KEY=https://repo.saltstack.com/apt/ubuntu/14.04/amd64/latest/SALTSTACK-GPG-KEY.pub
-SALT_SOURCES='http://repo.saltstack.com/apt/ubuntu/14.04/amd64/latest trusty main'
-SALTPAD_SOURCES=https://github.com/Lothiraldan/saltpad/releases/download/v0.3.1/dist.zip
-SALTPAD_ZIP=dist.zip
-SALTPAD_ZIP_NAME=dist
-SALTPAD_NAME=saltpad
+wget -O - https://repo.saltstack.com/apt/ubuntu/16.04/amd64/latest/SALTSTACK-GPG-KEY.pub | sudo apt-key add -
+echo 'deb http://repo.saltstack.com/apt/ubuntu/16.04/amd64/latest xenial main' | sudo tee /etc/apt/sources.list.d/saltstack.list
 
+echo 'Installing salt-master & salt-api...'
+sudo apt-get update
+sudo apt-get install salt-master -y
+sudo apt-get install salt-api -y
 
-echo 'Install salt-master...'
+salt-master --version
+salt-api --version
 
+echo 'Installing REST_CHERRYPY 3.2.3'
+# https://docs.saltstack.com/en/develop/ref/netapi/all/salt.netapi.rest_cherrypy.html
 
-wget -O - $SALT_KEY | sudo apt-key add -
+echo 'CherryPy current version:'
+pip show cherrypy 2>/dev/null |grep ^Version
 
-echo deb $SALT_SOURCES | sudo tee /etc/apt/sources.list.d/saltstack.list
+echo 'Uninstall current CherryPy...'
+sudo apt-get remove python-cherrypy3 -y
 
-sudo apt-get -y update
+echo 'Installing CherryPy v3.2.3 ...'
+sudo pip install cherrypy==3.2.3
 
-sudo apt-get -y install salt-api salt-master salt-cloud  salt-ssh salt-syndic
+echo 'CherryPy version after update...'
+pip show cherrypy 2>/dev/null |grep ^Version
 
-
-echo 'Install saltpad...'
-
-wget $SALTPAD_SOURCES
-
-unzip $SALTPAD_ZIP
-
-mv $SALTPAD_ZIP_NAME $SALTPAD_NAME
-
-if [ ! -d $SALTPAD_LOCATION ]; then
-    sudo  mkdir -p $SALTPAD_LOCATION
-fi
-
-sudo cp -R $SALTPAD_NAME $SALTPAD_LOCATION
+echo 'Restarting salt-master & salt-api...'
+sudo systemctl restart salt-master.service
+sudo systemctl restart salt-api.service
