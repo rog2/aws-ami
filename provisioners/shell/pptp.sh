@@ -22,11 +22,11 @@ echo "ms-dns 8.8.4.4" >> $PPTPD_OPTIONS
 
 /etc/init.d/pptpd restart
 
-# Setup IP Forwarding by uncommentting this line
-IPV4_LINE='net\.ipv4\.ip_forward=1'
-sed "s|^#$IPV4_LINE$|$IPV4_LINE|"  -i /etc/sysctl.conf
+# Setup IP Forwarding
+SYSCTL_CONF=/etc/sysctl.d/60-pptp-ip-forward.conf
+echo "net.ipv4.ip_forward=1" | tee $SYSCTL_CONF
 # Reload the configuration
-sysctl -p
+sysctl -p $SYSCTL_CONF
 
 # NAT and Forward rules
 IPTABLES_NAT='iptables -t nat -A POSTROUTING -s 192.168.0.0/24 -o eth0 -j MASQUERADE'
