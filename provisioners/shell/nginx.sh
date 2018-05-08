@@ -5,17 +5,12 @@
 #
 # NOTE: Run this script as ROOT
 
-TMP_DIR='/tmp/nginx-install'
-CODENAME='trusty'
 # Not using /etc/apt/sources.list because it's written by cloud-init on first boot of an instance,
 # so modifications made there will not survive a re-bundle.
 APT_SOURCE_FILE='/etc/apt/sources.list.d/nginx.list'
 
-if [ -d $TMP_DIR ]; then
-    rm -rf $TMP_DIR
-fi
-
-mkdir -p $TMP_DIR && cd $TMP_DIR
+CODENAME=$(lsb_release -cs)
+echo "Ubuntu Codename is $CODENAME"
 
 echo 'Adding nginx signing key ...'
 wget -q -O - http://nginx.org/keys/nginx_signing.key | apt-key add -
