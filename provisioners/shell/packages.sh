@@ -16,6 +16,7 @@ DEPS="
     tree
     jq
     aria2
+    gdb
     "
 
 # Version specific packages
