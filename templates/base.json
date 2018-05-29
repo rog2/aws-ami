@@ -65,6 +65,9 @@
     "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }}"
   },{
     "type": "shell",
+    "script": "provisioners/shell/cfn-helper-scripts.sh"
+  },{
+    "type": "shell",
     "inline": [
       "echo 'Validating provisioners...'",
       "aws --version",
