@@ -7,7 +7,7 @@
     "timezone": "Asia/Shanghai",
     "iam_instance_profile": "packer-ec2",
     "tag_os_version": "14.04 LTS",
-    "salt_version": ""
+    "salt_version": "2018.3"
   },
   "builders": [{
     "type": "amazon-ebs",

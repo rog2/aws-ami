@@ -1,33 +1,52 @@
 #!/bin/bash -e
 
-# https://repo.saltstack.com/#ubuntu
+CONFIG_DIR=/etc/salt/master.d
 
-wget -O - https://repo.saltstack.com/apt/ubuntu/16.04/amd64/latest/SALTSTACK-GPG-KEY.pub | sudo apt-key add -
-echo 'deb http://repo.saltstack.com/apt/ubuntu/16.04/amd64/latest xenial main' | sudo tee /etc/apt/sources.list.d/saltstack.list
+# https://docs.saltstack.com/en/latest/topics/tutorials/salt_bootstrap.html
 
-echo 'Installing salt-master & salt-api...'
-sudo apt-get update
-sudo apt-get install salt-master -y
+VERSION=$1
+
+if [ -z "$VERSION" ]; then
+    echo "No salt version specified, using latest stable release version."
+else
+    echo "Installing salt-master and salt-api at version $VERSION..."
+fi
+
+curl -o bootstrap-salt.sh -L https://bootstrap.saltstack.com
+sudo sh bootstrap-salt.sh -N -M stable $VERSION
+
 sudo apt-get install salt-api -y
 
+echo 'Create user saltapi to access salt-api...'
+sudo useradd -M -s /sbin/nologin saltapi
+echo "saltapi:saltapi" |sudo chpasswd
+
+echo 'Configurate salt-master...'
+sudo mkdir -p $CONFIG_DIR && cd "$CONFIG_DIR"
+
+sudo cat <<EOM > api.conf
+rest_cherrypy:
+  port: 8686
+  disable_ssl: True
+EOM
+
+sudo cat <<EOM > eauth.conf
+external_auth:
+  pam:
+    saltapi:
+      - .*
+      - '@runner'
+      - '@wheel'
+EOM
+
+sudo cat <<EOM > worker_threads.conf
+worker_threads: 16
+EOM
+
+echo 'Disable salt-master & salt-api...'
+sudo systemctl disable salt-master.service
+sudo systemctl disable salt-api.service
+
+echo 'Salt installed.'
 salt-master --version
 salt-api --version
-
-echo 'Installing REST_CHERRYPY 3.2.3'
-# https://docs.saltstack.com/en/develop/ref/netapi/all/salt.netapi.rest_cherrypy.html
-
-echo 'CherryPy current version:'
-pip show cherrypy 2>/dev/null |grep ^Version
-
-echo 'Uninstall current CherryPy...'
-sudo apt-get remove python-cherrypy3 -y
-
-echo 'Installing CherryPy v3.2.3 ...'
-sudo pip install cherrypy==3.2.3
-
-echo 'CherryPy version after update...'
-pip show cherrypy 2>/dev/null |grep ^Version
-
-echo 'Restarting salt-master & salt-api...'
-sudo systemctl restart salt-master.service
-sudo systemctl restart salt-api.service
