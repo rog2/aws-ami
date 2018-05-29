@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+# https://docs.saltstack.com/en/latest/topics/tutorials/salt_bootstrap.html
+
 VERSION=$1
 if [ -z "$VERSION" ]; then
     echo "No salt-minion version specified, using latest stable release version."
@@ -8,7 +10,7 @@ else
 fi
 
 curl -o bootstrap-salt.sh -L https://bootstrap.saltstack.com
-sudo sh bootstrap-salt.sh -P stable $VERSION
+sudo sh bootstrap-salt.sh stable $VERSION
 
 # disable salt-minion by default
 sudo systemctl disable salt-minion.service
