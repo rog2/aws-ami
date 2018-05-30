@@ -54,6 +54,19 @@
         "sudo nginx -s reload"
       ]
     }, {
+      "type": "file",
+      "source": "conf/salt/create_saltapi_user.sh",
+      "destination": "/tmp/"
+    }, {
+      "type": "shell",
+      "inline": [
+        "echo 'Updating rc.local configs...'",
+        "sudo mkdir -p /opt/salt",
+        "sudo cp -vf /tmp/create_saltapi_user.sh /opt/salt/",
+        "sudo chmod +x /opt/salt/*.sh",
+        "sudo sed -i '/^exit 0/i\/opt/salt/create_saltapi_user.sh' /etc/rc.local"
+      ]
+    }, {
       "type": "shell",
       "inline": [
         "echo 'Remove ssh key to make the AMI more secure.'",

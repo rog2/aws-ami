@@ -15,10 +15,6 @@ sudo sh bootstrap-salt.sh -N -M stable $VERSION
 
 sudo apt-get install salt-api -y
 
-echo 'Create user saltapi to access salt-api...'
-sudo useradd -M -s /sbin/nologin saltapi
-echo "saltapi:saltapi" |sudo chpasswd
-
 echo 'Disable salt-master & salt-api...'
 sudo systemctl disable salt-master.service
 sudo systemctl disable salt-api.service
