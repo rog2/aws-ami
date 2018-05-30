@@ -1,7 +1,5 @@
 #!/bin/bash -e
 
-CONFIG_DIR=/etc/salt/master.d
-
 # https://docs.saltstack.com/en/latest/topics/tutorials/salt_bootstrap.html
 
 VERSION=$1
@@ -20,28 +18,6 @@ sudo apt-get install salt-api -y
 echo 'Create user saltapi to access salt-api...'
 sudo useradd -M -s /sbin/nologin saltapi
 echo "saltapi:saltapi" |sudo chpasswd
-
-echo 'Configurate salt-master...'
-sudo mkdir -p $CONFIG_DIR && cd "$CONFIG_DIR"
-
-sudo cat <<EOM > api.conf
-rest_cherrypy:
-  port: 8686
-  disable_ssl: True
-EOM
-
-sudo cat <<EOM > eauth.conf
-external_auth:
-  pam:
-    saltapi:
-      - .*
-      - '@runner'
-      - '@wheel'
-EOM
-
-sudo cat <<EOM > worker_threads.conf
-worker_threads: 16
-EOM
 
 echo 'Disable salt-master & salt-api...'
 sudo systemctl disable salt-master.service

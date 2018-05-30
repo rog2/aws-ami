@@ -1,7 +1,7 @@
 #!/bin/bash -ex
 
 # Installs Nginx package with instructions in:
-# http://nginx.org/en/linux_packages.html
+# https://nginx.org/en/linux_packages.html
 #
 # NOTE: Run this script as ROOT
 
@@ -13,12 +13,12 @@ CODENAME=$(lsb_release -cs)
 echo "Ubuntu Codename is $CODENAME"
 
 echo 'Adding nginx signing key ...'
-wget -q -O - http://nginx.org/keys/nginx_signing.key | apt-key add -
+wget -q -O - https://nginx.org/keys/nginx_signing.key | apt-key add -
 
 echo 'Adding nginx repository to apt source list ...'
-echo '# nginx repository' >> $APT_SOURCE_FILE
-echo "deb http://nginx.org/packages/ubuntu/ $CODENAME nginx" >> "$APT_SOURCE_FILE"
-echo "deb-src http://nginx.org/packages/ubuntu/ $CODENAME nginx" >> "$APT_SOURCE_FILE"
+echo '# Stable version' >> $APT_SOURCE_FILE
+echo "deb https://nginx.org/packages/ubuntu/ $CODENAME nginx" >> "$APT_SOURCE_FILE"
+echo "deb-src https://nginx.org/packages/ubuntu/ $CODENAME nginx" >> "$APT_SOURCE_FILE"
 
 echo 'Installing nginx by apt-get ...'
 apt-get -y update

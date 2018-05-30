@@ -28,9 +28,31 @@
       "type": "shell",
       "inline": ["sleep 10"]
     }, {
-        "type": "shell",
-        "script": "provisioners/shell/salt-master.sh",
-        "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }} {{user `salt_version`}}"    
+      "type": "shell",
+      "script": "provisioners/shell/salt-master.sh",
+      "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }} {{user `salt_version`}}"
+    }, {
+      "type": "file",
+      "source": "conf/salt/master.d",
+      "destination": "/etc/salt"
+    }, {
+      "type": "shell",
+      "script": "provisioners/shell/nginx.sh",
+      "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }}"
+    }, {
+      "type": "file",
+      "source": "conf/nginx",
+      "destination": "/tmp"
+    }, {
+      "type": "shell",
+      "inline": [
+        "echo 'Updating nginx configs...'",
+        "sudo rm -vf /etc/nginx/nginx.conf",
+        "sudo rm -vf /etc/nginx/conf.d/*.conf",
+        "sudo cp -vf /tmp/nginx/nginx.conf /etc/nginx/nginx.conf",
+        "sudo cp -vf /tmp/nginx/conf.d/salt-api.conf /etc/nginx/conf.d/salt-api.conf",
+        "sudo nginx -s reload"
+      ]
     }, {
       "type": "shell",
       "inline": [
