@@ -17,4 +17,4 @@ sudo systemctl disable apt-daily-upgrade.timer
 
 # Disable the update/upgrade script
 sudo mkdir -p "$APT_PERIODIC_CONF_PATH"
-echo 'APT::Periodic::Enable "0"' | sudo tee "$APT_PERIODIC_CONF_FILE"
+echo 'APT::Periodic::Enable "0";' | sudo tee "$APT_PERIODIC_CONF_FILE"
