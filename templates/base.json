@@ -3,10 +3,10 @@
   "variables": {
     "region": "us-east-1",
     "source_ami": null,
-    "ami_name": "base-ubuntu-14.04-{{isotime \"20060102\"}}",
+    "ami_name": "base-ubuntu-16.04-{{isotime \"20060102\"}}",
     "timezone": "Asia/Shanghai",
     "iam_instance_profile": "packer-ec2",
-    "tag_os_version": "14.04 LTS",
+    "tag_os_version": "16.04 LTS",
     "salt_version": "2018.3"
   },
   "builders": [{
