@@ -21,7 +21,7 @@ sed -i '0,/^\(server\|pool\).*/s/^\(server\|pool\).*/server '"$AMAZON_NTP_IP"' p
 echo "initstepslew 5 $AMAZON_NTP_IP" >> $CONF_FILE
 
 echo "Restarting Amazon Time Sync Service..."
-/etc/init.d/chrony restart
+systemctl restart chrony
 
 echo "Verifying Amazon Time Sync Service..."
 # waiting until source being determined
