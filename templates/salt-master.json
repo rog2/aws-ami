@@ -35,7 +35,10 @@
     }, {
       "type": "file",
       "source": "conf/salt/master.d",
-      "destination": "/etc/salt"
+      "destination": "/tmp"
+    }, {
+      "type": "shell",
+      "inline": ["sudo cp -vfr /tmp/master.d /etc/salt"]
     }, {
       "type": "shell",
       "script": "provisioners/shell/nginx.sh",
