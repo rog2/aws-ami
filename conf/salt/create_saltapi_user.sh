@@ -14,7 +14,7 @@ then
 
     echo "//////////////////////////////////////////////////////////////////////////" | tee -a /var/log/boot.log
     echo "//                                                                      //" | tee -a /var/log/boot.log
-    echo "//               Setting salt-api password to '$PASSWD'              //" | tee -a /var/log/boot.log
+    echo "//               Set saltapi password to '$PASSWD'              //" | tee -a /var/log/boot.log
     echo "//                                                                      //" | tee -a /var/log/boot.log
     echo "//////////////////////////////////////////////////////////////////////////" | tee -a /var/log/boot.log
 
