@@ -3,6 +3,11 @@
 # needs run as root.
 CORE_PATTERN_CONF=/etc/sysctl.d/98-seasungames-core-pattern.conf
 
+if [ "$EUID" -ne 0 ]
+    then echo "Please run as root."
+    exit 1
+fi
+
 echo 'Stopping and diabling apport service..'
 systemctl stop apport.service
 /lib/systemd/systemd-sysv-install disable apport

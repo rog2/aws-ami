@@ -5,6 +5,11 @@
 #
 # needs run as root.
 
+if [ "$EUID" -ne 0 ]
+    then echo "Please run as root."
+    exit 1
+fi
+
 apt-get -y install pptpd
 
 # Class-C sized address

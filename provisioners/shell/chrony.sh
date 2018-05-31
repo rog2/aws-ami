@@ -3,13 +3,18 @@
 # needs run as root.
 
 AMAZON_NTP_IP=169.254.169.123
+CONF_FILE=/etc/chrony/chrony.conf
+
+if [ "$EUID" -ne 0 ]
+    then echo "Please run as root."
+    exit 1
+fi
 
 echo "Install Amazon Time Sync Service..."
 # http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/set-time.html
 apt install chrony -y
 
 echo "Configuring Amazon Time Sync Service..."
-CONF_FILE=/etc/chrony/chrony.conf
 
 sed -i '0,/^\(server\|pool\).*/s/^\(server\|pool\).*/server '"$AMAZON_NTP_IP"' prefer iburst\n&/' $CONF_FILE
 
