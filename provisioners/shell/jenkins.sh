@@ -24,6 +24,11 @@ JENKINS_REPO_STABLE='http://pkg.jenkins-ci.org/debian-stable'
 JENKINS_KEY=$JENKINS_KEY_LATEST
 JENKINS_REPO=$JENKINS_REPO_LATEST
 
+if [ "$EUID" -ne 0 ]
+    then echo "Please run as root."
+    exit 1
+fi
+
 if [ -d "$TMP_DIR" ]; then
     rm -rf "$TMP_DIR"
 fi

@@ -9,6 +9,11 @@
 # so modifications made there will not survive a re-bundle.
 APT_SOURCE_FILE='/etc/apt/sources.list.d/nginx.list'
 
+if [ "$EUID" -ne 0 ]
+    then echo "Please run as root."
+    exit 1
+fi
+
 CODENAME=$(lsb_release -cs)
 echo "Ubuntu Codename is $CODENAME"
 
