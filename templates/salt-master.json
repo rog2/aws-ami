@@ -73,6 +73,10 @@
     }, {
       "type": "shell",
       "inline": [
+        "echo 'Validating provisioners...'",
+        "nginx -v",
+        "salt-master --version",
+        "salt-api --version",
         "echo 'Remove ssh key to make the AMI more secure.'",
         "rm -vf ~/.ssh/authorized_keys"
       ]
