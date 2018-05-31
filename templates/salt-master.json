@@ -55,7 +55,7 @@
         "sudo rm -vf /etc/nginx/conf.d/*.conf",
         "sudo cp -vf /tmp/nginx/nginx.conf /etc/nginx/nginx.conf",
         "sudo cp -vf /tmp/nginx/conf.d/salt-api.conf /etc/nginx/conf.d/salt-api.conf",
-        "sudo nginx -s reload"
+        "sudo systemctl restart nginx"
       ]
     }, {
       "type": "file",
