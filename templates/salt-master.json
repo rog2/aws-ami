@@ -5,6 +5,7 @@
       "source_ami": null,
       "ami_name": "salt-master-ubuntu-16.04-{{isotime \"20060102\"}}",
       "iam_instance_profile": "packer-ec2",
+      "tag_os_version": "16.04 LTS",
       "salt_version": "2018.3"
     },
     "builders": [{
@@ -19,7 +20,7 @@
       "tags": {
         "Name": "{{user `ami_name`}}",
         "OS": "Ubuntu Server",
-        "OS Version": "16.04 LTS",
+        "OS Version": "{{user `tag_os_version`}}",
         "Base AMI": "{{user `source_ami`}}",
         "Salt Version": "{{user `salt_version`}}"
       }
