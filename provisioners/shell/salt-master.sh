@@ -11,7 +11,7 @@ else
 fi
 
 curl -o bootstrap-salt.sh -L https://bootstrap.saltstack.com
-sudo sh bootstrap-salt.sh -N -M stable $VERSION
+sudo sh bootstrap-salt.sh -N -M -L stable $VERSION
 
 sudo apt-get install salt-api -y
 
@@ -20,5 +20,4 @@ sudo systemctl disable salt-master.service
 sudo systemctl disable salt-api.service
 
 echo 'Salt installed.'
-salt-master --version
-salt-api --version
+salt --versions-report
