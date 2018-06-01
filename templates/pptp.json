@@ -4,7 +4,8 @@
     "region": "us-east-1",
     "source_ami": null,
     "ami_name": "pptp-ubuntu-14.04-{{isotime \"20060102\"}}",
-    "iam_instance_profile": "packer-ec2"
+    "iam_instance_profile": "packer-ec2",
+    "subnet_id": ""
   },
   "builders": [{
     "type": "amazon-ebs",
@@ -15,6 +16,8 @@
     "instance_type": "t2.micro",
     "iam_instance_profile": "{{user `iam_instance_profile`}}",
     "ssh_username": "ubuntu",
+    "associate_public_ip_address": true,
+    "subnet_id": "{{user `subnet_id`}}",
     "tags": {
       "Name": "{{user `ami_name`}}",
       "OS": "Ubuntu Server",

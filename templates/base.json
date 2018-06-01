@@ -7,7 +7,8 @@
     "timezone": "Asia/Shanghai",
     "iam_instance_profile": "packer-ec2",
     "tag_os_version": "16.04 LTS",
-    "salt_version": "2018.3"
+    "salt_version": "2018.3",
+    "subnet_id": ""
   },
   "builders": [{
     "type": "amazon-ebs",
@@ -18,6 +19,8 @@
     "instance_type": "t2.micro",
     "iam_instance_profile": "{{user `iam_instance_profile`}}",
     "ssh_username": "ubuntu",
+    "associate_public_ip_address": true,
+    "subnet_id": "{{user `subnet_id`}}",
     "tags": {
       "Name": "{{user `ami_name`}}",
       "OS": "Ubuntu Server",
