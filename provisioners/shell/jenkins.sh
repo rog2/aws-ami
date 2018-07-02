@@ -12,13 +12,13 @@ APT_SOURCE_FILE='/etc/apt/sources.list.d/jenkins.list'
 
 # Lastest and greatest release, see:
 # http://pkg.jenkins-ci.org/debian/
-JENKINS_KEY_LATEST='http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key'
-JENKINS_REPO_LATEST='http://pkg.jenkins-ci.org/debian'
+JENKINS_KEY_LATEST='https://pkg.jenkins.io/debian/jenkins.io.key'
+JENKINS_REPO_LATEST='https://pkg.jenkins.io/debian'
 
 # LTS stable relese, see:
 # http://pkg.jenkins-ci.org/debian-stable/
-JENKINS_KEY_STABLE='http://pkg.jenkins-ci.org/debian-stable/jenkins-ci.org.key'
-JENKINS_REPO_STABLE='http://pkg.jenkins-ci.org/debian-stable'
+JENKINS_KEY_STABLE='https://pkg.jenkins.io/debian-stable/jenkins.io.key'
+JENKINS_REPO_STABLE='https://pkg.jenkins.io/debian-stable'
 
 # Switch between latest and stable
 JENKINS_KEY=$JENKINS_KEY_LATEST
