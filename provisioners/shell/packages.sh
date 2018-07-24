@@ -3,7 +3,8 @@
 set -e
 
 # Do software and security update
-sudo apt-get update && sudo apt-get upgrade -yq
+# sudo apt-get update && sudo apt-get upgrade -y
+sudo apt-get -y -o DPkg::options::="--force-confdef" -o DPkg::options::="--force-confold"  update && apt-get -y -o DPkg::options::="--force-confdef" -o DPkg::options::="--force-confold"  upgrade -y
 
 # Common packages across all versions
 DEPS="
@@ -26,6 +27,7 @@ DEPS_TRUSTY="
 DEPS_XENIAL="
     ruby2.3
     "
+# https://packages.ubuntu.com/bionic/ruby
 DEPS_BIONIC="
     ruby2.5
     "
