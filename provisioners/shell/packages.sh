@@ -3,7 +3,7 @@
 set -e
 
 # Do software and security update
-sudo apt-get update && sudo apt-get upgrade -y
+sudo apt-get update && sudo apt-get upgrade -yq
 
 # Common packages across all versions
 DEPS="
