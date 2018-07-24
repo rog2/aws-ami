@@ -4,9 +4,9 @@ set -e
 
 # Do software and security update
 
-sudo DEBIAN_FRONTEND=noninteractive apt-get -y -o DPkg::options::="--force-confdef" -o DPkg::options::="--force-confold"  install grub-pc
-sudo apt-get update && sudo apt-get upgrade -y
+# sudo apt-get update && sudo apt-get upgrade -y
 # sudo apt-get -y -o DPkg::options::="--force-confdef" -o DPkg::options::="--force-confold"  update && sudo apt-get -y -o DPkg::options::="--force-confdef" -o DPkg::options::="--force-confold"  dist-upgrade -y
+sudo DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" dist-upgrade
 
 # Common packages across all versions
 DEPS="
