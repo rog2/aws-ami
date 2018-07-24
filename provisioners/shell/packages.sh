@@ -26,11 +26,16 @@ DEPS_TRUSTY="
 DEPS_XENIAL="
     ruby2.3
     "
+DEPS_BIONIC="
+    ruby2.5
+    "
 
 CODENAME=$(lsb_release -s -c)
 
 if [ "$CODENAME" = "xenial" ]; then
     DEPS="$DEPS $DEPS_XENIAL"
+elif [ "$CODENAME" = "bionic" ]; then
+    DEPS="$DEPS $DEPS_BIONIC"
 else
     DEPS="$DEPS $DEPS_TRUSTY"
 fi
