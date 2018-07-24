@@ -1,4 +1,4 @@
 #!/bin/bash -e
 
 sudo apt-get -y install python-pip
-sudo pip install boto --timeout 60
+sudo pip --default-timeout=100 install boto
