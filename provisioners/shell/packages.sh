@@ -4,7 +4,7 @@ set -e
 
 # Do software and security update
 # sudo apt-get update && sudo apt-get upgrade -y
-sudo apt-get -y -o DPkg::options::="--force-confdef" -o DPkg::options::="--force-confold"  update && apt-get -y -o DPkg::options::="--force-confdef" -o DPkg::options::="--force-confold"  upgrade -y
+sudo apt-get -y -o DPkg::options::="--force-confdef" -o DPkg::options::="--force-confold"  update && sudo apt-get -y -o DPkg::options::="--force-confdef" -o DPkg::options::="--force-confold"  dist-upgrade -y
 
 # Common packages across all versions
 DEPS="
