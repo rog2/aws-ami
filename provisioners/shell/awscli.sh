@@ -8,7 +8,7 @@
 # sudo -H pip3 install awscli
 
 sudo apt-get update
-sudo apt-get install awscli
+sudo apt-get install -y awscli
 
 # Enable Command Completion for AWS CLI
 echo 'complete -C $(which aws_completer) aws' >> ~/.bash_completion
