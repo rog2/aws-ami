@@ -4,9 +4,9 @@
 # To upgrade an existing AWS CLI installation, use the --upgrade option:
 # sudo pip install --upgrade awscli
 sudo apt update
-sudo apt install -y --timeout=300 python-pip
+sudo apt install -y python-pip
 
-sudo pip install awscli
+sudo pip install --timeout=300 awscli
 # sudo apt-get update
 # sudo apt-get install -y awscli
 
