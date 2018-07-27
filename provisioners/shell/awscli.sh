@@ -6,9 +6,9 @@
 sudo apt update
 sudo apt install -y python-pip
 
-sudo pip install --no-cache-dir --timeout=3000 awscli
+# sudo pip install --no-cache-dir --timeout=3000 awscli
 # sudo apt-get update
-# sudo apt-get install -y awscli
+sudo apt-get install -y awscli
 
 # Enable Command Completion for AWS CLI
 echo 'complete -C $(which aws_completer) aws' >> ~/.bash_completion
