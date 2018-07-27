@@ -5,7 +5,7 @@
 
 # sudo easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
 # sudo pip -y --timeout=3000 install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
-wget -c -t0 -T6000 https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
+wget https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
 
 md5sum aws-cfn-bootstrap-latest.tar.gz
 pip install aws-cfn-bootstrap-latest.tar.gz
