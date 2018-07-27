@@ -6,7 +6,7 @@
 sudo apt update
 sudo apt install -y python-pip
 
-sudo pip install --timeout=300 awscli
+sudo pip install --timeout=3000 awscli
 # sudo apt-get update
 # sudo apt-get install -y awscli
 
