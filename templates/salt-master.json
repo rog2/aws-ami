@@ -44,6 +44,9 @@
       "inline": ["sudo cp -vfr /tmp/master.d /etc/salt"]
     }, {
       "type": "shell",
+      "script": "provisioners/shell/boto.sh"
+    }, {
+      "type": "shell",
       "script": "provisioners/shell/nginx.sh",
       "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }}"
     }, {
@@ -77,6 +80,7 @@
       "type": "shell",
       "inline": [
         "echo 'Validating provisioners...'",
+        "pip show boto",
         "nginx -v",
         "salt-master --version",
         "salt-api --version",
