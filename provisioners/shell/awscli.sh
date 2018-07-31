@@ -1,11 +1,16 @@
 #!/bin/bash -ex
 
-sudo apt-get -y install python-pip
+
+sudo mkdir ~/.pip
+sudo chmod -R a+w ~/.pip
+echo -e '[global]\nindex-url = https://pypi.tuna.tsinghua.edu.cn/simple\n[install]\ntrusted-host=mirrors.aliyun.com' >> ~/.pip/pip.conf
+
+sudo apt-get -y install python3-pip
 
 # Install AWS CLI using pip
 # To upgrade an existing AWS CLI installation, use the --upgrade option:
 # sudo pip install --upgrade awscli
-sudo pip install awscli -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
+sudo pip3 install awscli
 
 # sudo apt-get update
 # sudo apt-get install -y awscli
