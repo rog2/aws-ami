@@ -6,6 +6,13 @@
 # 中国区各个服务的 Endpoint:http://docs.amazonaws.cn/en_us/general/latest/gr/rande.html
 
 sudo apt-get install python-setuptools
-sudo python -m easy_install https://s3.cn-north-1.amazonaws.com.cn/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
+
+if [[ $region == cn-* ]]; then
+    sudo python -m easy_install "https://s3.cn-north-1.amazonaws.com.cn/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz"
+else
+    sudo python -m easy_install "https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz"
+fi
+
+sudo python -m easy_install url
 
 sudo ln /usr/local/bin/cfn-hup /etc/init.d/
