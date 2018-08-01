@@ -9,9 +9,10 @@
 # https://packages.ubuntu.com/bionic/all/python-setuptools/filelist
 # https://packages.ubuntu.com/xenial/all/python-setuptools/filelist
 
-sudo apt-get install python-setuptools
-sudo wget https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
-sudo python /usr/lib/python2.7/dist-packages/easy_install.py aws-cfn-bootstrap-latest.tar.gz
-sudo rm -f aws-cfn-bootstrap-latest.tar.gz
 
-sudo ln /usr/local/bin/cfn-hup /etc/init.d/
+# sudo apt-get install python-setuptools
+# sudo wget https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
+# sudo python /usr/lib/python2.7/dist-packages/easy_install.py aws-cfn-bootstrap-latest.tar.gz
+# sudo rm -f aws-cfn-bootstrap-latest.tar.gz
+
+# sudo ln /usr/local/bin/cfn-hup /etc/init.d/
