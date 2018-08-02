@@ -1,5 +1,6 @@
 #!/bin/bash -ex
 
+echo "awscli check region"
 echo "$1"
 
 if [[ $1 == cn-* ]]; then
