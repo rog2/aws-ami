@@ -72,7 +72,8 @@
     "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }}"
   },{
     "type": "shell",
-    "script": "provisioners/shell/cfn-helper-scripts.sh"
+    "script": "provisioners/shell/cfn-helper-scripts.sh",
+    "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }} {{user `region`}}"
   },{
     "type": "shell",
     "inline": [

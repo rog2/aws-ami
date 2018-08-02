@@ -7,12 +7,10 @@
 
 sudo apt-get install python-setuptools
 
-if [[ $region == cn-* ]]; then
+if [[ $1 == cn-* ]]; then
     sudo python -m easy_install "https://s3.cn-north-1.amazonaws.com.cn/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz"
 else
     sudo python -m easy_install "https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz"
 fi
-
-sudo python -m easy_install url
 
 sudo ln /usr/local/bin/cfn-hup /etc/init.d/
