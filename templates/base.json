@@ -37,7 +37,8 @@
     "script": "provisioners/shell/packages.sh"
   }, {
     "type": "shell",
-    "script": "provisioners/shell/awscli.sh"
+    "script": "provisioners/shell/awscli.sh",
+    "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }} {{user `region`}}"
   }, {
     "type": "shell",
     "script": "provisioners/shell/git.sh"

@@ -1,9 +1,8 @@
 #!/bin/bash -ex
 
-echo "$region"
 echo "$1"
 
-if [[ $region == cn-* ]]; then
+if [[ $1 == cn-* ]]; then
     echo "begin set region"
     sudo mkdir ~/.pip
     sudo chmod -R a+w ~/.pip
