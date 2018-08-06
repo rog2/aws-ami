@@ -1,11 +1,17 @@
 #!/bin/bash -ex
 
-sudo apt-get -y install python-pip
+if [[ $1 == cn-* ]]; then
+    sudo mkdir ~/.pip
+    sudo chmod -R a+w ~/.pip
+    sudo cp -vf /tmp/pip/pip.conf ~/.pip/pip.conf
+fi
+
+sudo apt-get -y install python3-pip
 
 # Install AWS CLI using pip
 # To upgrade an existing AWS CLI installation, use the --upgrade option:
-#   sudo pip install --upgrade awscli
-sudo pip install awscli
+# sudo pip install --upgrade awscli
+sudo pip3 install awscli
 
 # Enable Command Completion for AWS CLI
 echo 'complete -C $(which aws_completer) aws' >> ~/.bash_completion
