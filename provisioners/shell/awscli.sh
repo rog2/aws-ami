@@ -3,7 +3,7 @@
 if [[ $1 == cn-* ]]; then
     sudo mkdir ~/.pip
     sudo chmod -R a+w ~/.pip
-    echo -e '[global]\nindex-url = https://pypi.tuna.tsinghua.edu.cn/simple\n[install]\ntrusted-host=mirrors.aliyun.com' >> ~/.pip/pip.conf
+    sudo cp -vf /tmp/pip/pip.conf ~/.pip/pip.conf
 fi
 
 sudo apt-get -y install python3-pip
