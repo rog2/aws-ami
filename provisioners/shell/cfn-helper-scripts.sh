@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-sudo apt-get install python-setuptools
+sudo apt-get -y install python-setuptools
 
 if [[ $1 == cn-* ]]; then
     #https://docs.amazonaws.cn/en_us/AWSCloudFormation/latest/UserGuide/cfn-helper-scripts-reference.html 
