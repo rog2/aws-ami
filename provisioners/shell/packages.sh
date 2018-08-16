@@ -2,9 +2,6 @@
 
 set -e
 
-# Do software and security update
-
-# sudo apt-get update && sudo apt-get upgrade -y
 sudo apt-get update
 # https://askubuntu.com/questions/146921/how-do-i-apt-get-y-dist-upgrade-without-a-grub-config-prompt?answertab=active#tab-top
 # the default answer is “keep the existing file”
