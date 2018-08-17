@@ -33,6 +33,10 @@
     "type": "shell",
     "inline": ["sleep 10"]
   }, {
+    "type": "file",
+    "source": "conf/pip",
+    "destination": "/tmp"
+  }, {
     "type": "shell",
     "script": "provisioners/shell/pip-source.sh",
     "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }} {{user `region`}}"
