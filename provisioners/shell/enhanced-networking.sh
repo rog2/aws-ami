@@ -10,7 +10,7 @@ FILE="$FOLDER.tar.gz"
 DOWNLOAD_URL="http://sourceforge.net/projects/e1000/files/ixgbevf%20stable/$VERSION/$FILE"
 DKMS_CONF="/usr/src/$FOLDER/dkms.conf"
 
-sudo apt-get update && sudo apt-get upgrade -y
+sudo apt-get update
 
 sudo apt-get install -y dkms
 
