@@ -25,8 +25,10 @@ popd
 
 # Creates user prometheus if not exist
 if ! id -u prometheus > /dev/null 2>&1; then
-    sudo adduser --no-create-home       \
+    sudo adduser --system               \
         --disabled-login                \
+        --no-create-home                \
+        --home /nonexistent             \
         --shell /usr/sbin/nologin       \
         --gecos "Prometheus Monitoring" \
         prometheus
