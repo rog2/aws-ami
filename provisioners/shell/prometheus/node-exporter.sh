@@ -25,7 +25,7 @@ popd
 
 # Creates user prometheus if not exist
 if ! id -u prometheus > /dev/null 2>&1; then
-    sudo adduser --system               \
+    sudo adduser --system --group       \
         --disabled-login                \
         --no-create-home                \
         --home /nonexistent             \
