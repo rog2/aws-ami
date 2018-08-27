@@ -1,12 +1,15 @@
 #!/bin/bash
 
 SALT_USER=salt
-PASSWD_ALPHANUM='1234567890!@#$%qwertQWERTasdfgASDFGzxcvbZXCVByuiopYUIOPhjklHJKLnmNM'
+PASSWD_LENGTH=10
+
+randpw() { tr -dc [:alnum:] < /dev/urandom | head -c${1:-15}; echo; }
+
 # Create user if not exists
 id $SALT_USER >& /dev/null
 if [ $? -ne 0 ]
 then
-    SALT_PASSWD=$(</dev/urandom tr -dc $PASSWD_ALPHANUM | head -c 10; echo "")
+    SALT_PASSWD=$(randpw $PASSWD_LENGTH)
 
     sudo adduser --system --group       \
         --disabled-login                \
