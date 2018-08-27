@@ -62,16 +62,14 @@
       ]
     }, {
       "type": "file",
-      "source": "conf/salt/create_saltapi_user.sh",
+      "source": "conf/salt/create-salt-user.sh",
       "destination": "/tmp/"
     }, {
       "type": "shell",
       "inline": [
-        "echo 'Updating rc.local configs...'",
-        "sudo mkdir -p /opt/salt",
-        "sudo cp -vf /tmp/create_saltapi_user.sh /opt/salt/",
-        "sudo chmod +x /opt/salt/*.sh",
-        "sudo sed -i '/^exit 0/i\/opt/salt/create_saltapi_user.sh' /etc/rc.local"
+        "echo 'Upload 99-create-salt-user.sh to /var/lib/cloud/scripts/per-instance...'",
+        "sudo chmod +x /tmp/create-salt-user.sh",
+        "sudo cp -vf /tmp/create-salt-user.sh /var/lib/cloud/scripts/per-instance/99-create-salt-user.sh"
       ]
     }, {
       "type": "shell",
