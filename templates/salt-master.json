@@ -67,7 +67,7 @@
     }, {
       "type": "shell",
       "inline": [
-        "echo 'Updating rc.local configs...'",
+        "echo 'Updating 99-create-saltapi-user.sh to /var/lib/cloud/scripts/per-instance...'",
         "sudo chmod +x /tmp/create_saltapi_user.sh",
         "sudo cp -vf /tmp/create_saltapi_user.sh /var/lib/cloud/scripts/per-instance/99-create-saltapi-user.sh"
       ]
