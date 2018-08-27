@@ -1,25 +1,25 @@
 #!/bin/bash
 
-USER=salt
-PASSWD_RANGE='1234567890!@#$%qwertQWERTasdfgASDFGzxcvbZXCVByuiopYUIOPhjklHJKLnmNM'
-#create user if not exists
-id $USER >& /dev/null
+SALT_USER=salt
+PASSWD_ALPHANUM='1234567890!@#$%qwertQWERTasdfgASDFGzxcvbZXCVByuiopYUIOPhjklHJKLnmNM'
+# Create user if not exists
+id $SALT_USER >& /dev/null
 if [ $? -ne 0 ]
 then
-    PASSWD=$(</dev/urandom tr -dc $PASSWD_RANGE | head -c 10; echo "")
+    SALT_PASSWD=$(</dev/urandom tr -dc $PASSWD_ALPHANUM | head -c 10; echo "")
 
     sudo adduser --system --group       \
         --disabled-login                \
         --no-create-home                \
         --home /nonexistent             \
         --shell /usr/sbin/nologin       \
-        $USER
+        $SALT_USER
 
-    echo " sudopsw" |sudo  -S echo $USER:$PASSWD |sudo chpasswd
+    echo " sudopsw" | sudo  -S echo $SALT_USER:$SALT_PASSWD | sudo chpasswd
 
     echo "//////////////////////////////////////////////////////////////////////////" | tee -a /var/log/boot.log
     echo "//                                                                      //" | tee -a /var/log/boot.log
-    echo "//               Set salt password to '$PASSWD'              //" | tee -a /var/log/boot.log
+    echo "//               Set $SALT_USER password to '$SALT_PASSWD'              //" | tee -a /var/log/boot.log
     echo "//                                                                      //" | tee -a /var/log/boot.log
     echo "//////////////////////////////////////////////////////////////////////////" | tee -a /var/log/boot.log
 
