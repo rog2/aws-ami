@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SALT_USER=salt
-PASSWD_LENGTH=10
+PASSWD_LENGTH=32
 
 randpw() { tr -dc [:alnum:] < /dev/urandom | head -c${1:-15}; echo; }
 
