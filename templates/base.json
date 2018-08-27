@@ -16,7 +16,7 @@
     "source_ami": "{{user `source_ami`}}",
     "ami_name": "{{user `ami_name`}}",
     "ami_description": "The AMI that other AMIs based on.",
-    "instance_type": "t2.micro",
+    "instance_type": "t2.medium",
     "iam_instance_profile": "{{user `iam_instance_profile`}}",
     "ssh_username": "ubuntu",
     "associate_public_ip_address": true,
@@ -32,6 +32,14 @@
   "provisioners": [{
     "type": "shell",
     "inline": ["sleep 10"]
+  }, {
+    "type": "file",
+    "source": "conf/pip",
+    "destination": "/tmp"
+  }, {
+    "type": "shell",
+    "script": "provisioners/shell/pip-source.sh",
+    "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }} {{user `region`}}"
   }, {
     "type": "shell",
     "script": "provisioners/shell/packages.sh"
@@ -71,7 +79,8 @@
     "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }}"
   },{
     "type": "shell",
-    "script": "provisioners/shell/cfn-helper-scripts.sh"
+    "script": "provisioners/shell/cfn-helper-scripts.sh",
+    "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }} {{user `region`}}"
   },{
     "type": "shell",
     "inline": [
