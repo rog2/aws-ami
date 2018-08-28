@@ -83,12 +83,19 @@
     "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }} {{user `region`}}"
   },{
     "type": "shell",
+    "script": "provisioners/shell/elastic/apt-init.sh"
+  },{
+    "type": "shell",
+    "script": "provisioners/shell/elastic/filebeat.sh"
+  },{
+    "type": "shell",
     "inline": [
       "echo 'Validating provisioners...'",
       "aws --version",
       "git --version",
       "java -version",
       "salt-minion --version",
+      "filebeat version",
       "echo 'Remove ssh key to make the AMI more secure.'",
       "rm -vf ~/.ssh/authorized_keys"
     ]
