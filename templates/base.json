@@ -99,6 +99,7 @@
       "java -version",
       "salt-minion --version",
       "filebeat version",
+      "prometheus-node-exporter --version",
       "echo 'Remove ssh key to make the AMI more secure.'",
       "rm -vf ~/.ssh/authorized_keys"
     ]
