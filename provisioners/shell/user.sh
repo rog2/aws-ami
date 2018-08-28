@@ -2,7 +2,12 @@
 
 # echo 'Creating user pirates...'
 
-sudo useradd -s /bin/bash -m pirates
+sudo adduser --system --group       \
+    --disabled-login                \
+    --no-create-home                \
+    --home /nonexistent             \
+    --shell /usr/sbin/nologin       \
+    pirates
 
 # echo 'Adding user to group systemd-journal...'
 
