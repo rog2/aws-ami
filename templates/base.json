@@ -89,6 +89,9 @@
     "script": "provisioners/shell/elastic/filebeat.sh"
   },{
     "type": "shell",
+    "script": "provisioners/shell/prometheus/node-exporter.sh"
+  },{
+    "type": "shell",
     "inline": [
       "echo 'Validating provisioners...'",
       "aws --version",
