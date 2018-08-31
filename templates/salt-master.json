@@ -6,7 +6,6 @@
       "ami_name": "salt-master-ubuntu-16.04-{{isotime \"20060102\"}}",
       "iam_instance_profile": "packer-ec2",
       "tag_os_version": "16.04 LTS",
-      "salt_version": "2018.3",
       "subnet_id": ""
     },
     "builders": [{
@@ -24,8 +23,7 @@
         "Name": "{{user `ami_name`}}",
         "OS": "Ubuntu Server",
         "OS Version": "{{user `tag_os_version`}}",
-        "Base AMI": "{{user `source_ami`}}",
-        "Salt Version": "{{user `salt_version`}}"
+        "Base AMI": "{{user `source_ami`}}"
       }
     }],
     "provisioners": [{
@@ -33,8 +31,10 @@
       "inline": ["sleep 10"]
     }, {
       "type": "shell",
-      "script": "provisioners/shell/salt-master.sh",
-      "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }} {{user `salt_version`}}"
+      "script": "provisioners/shell/salt/salt-repo.sh"
+    }, {
+      "type": "shell",
+      "script": "provisioners/shell/salt/salt-master.sh"
     }, {
       "type": "file",
       "source": "conf/salt/master.d",
