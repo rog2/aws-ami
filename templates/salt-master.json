@@ -3,9 +3,9 @@
     "variables": {
       "region": "us-east-1",
       "source_ami": null,
-      "ami_name": "salt-master-ubuntu-16.04-{{isotime \"20060102\"}}",
+      "ami_name": "salt-master-ubuntu-18.04-{{isotime \"20060102\"}}",
       "iam_instance_profile": "packer-ec2",
-      "tag_os_version": "16.04 LTS",
+      "tag_os_version": "18.04 LTS",
       "subnet_id": ""
     },
     "builders": [{
