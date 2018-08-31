@@ -3,11 +3,10 @@
   "variables": {
     "region": "us-east-1",
     "source_ami": null,
-    "ami_name": "base-ubuntu-16.04-{{isotime \"20060102\"}}",
+    "ami_name": "base-ubuntu-18.04-{{isotime \"20060102\"}}",
     "timezone": "Asia/Shanghai",
     "iam_instance_profile": "packer-ec2",
-    "tag_os_version": "16.04 LTS",
-    "salt_version": "2018.3",
+    "tag_os_version": "18.04 LTS",
     "subnet_id": ""
   },
   "builders": [{
@@ -25,8 +24,7 @@
       "Name": "{{user `ami_name`}}",
       "OS": "Ubuntu Server",
       "OS Version": "{{user `tag_os_version`}}",
-      "Base AMI": "{{user `source_ami`}}",
-      "Salt Version": "{{user `salt_version`}}"
+      "Base AMI": "{{user `source_ami`}}"
     }
   }],
   "provisioners": [{
@@ -63,8 +61,10 @@
     "script": "provisioners/shell/apt-daily-conf.sh"
   }, {
     "type": "shell",
-    "script": "provisioners/shell/salt-minion.sh",
-    "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }} {{user `salt_version`}}"
+    "script": "provisioners/shell/salt/salt-repo.sh"
+  },{
+    "type": "shell",
+    "script": "provisioners/shell/salt/salt-minion.sh"
   },{
     "type": "shell",
     "script": "provisioners/shell/core-conf.sh",
