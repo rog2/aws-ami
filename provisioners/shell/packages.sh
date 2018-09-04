@@ -17,6 +17,9 @@ DEPS="
     aria2
     gdb
     ruby2.5
+    python3-pip
+    python3-boto
+    python3-boto3
     "
 
 # Install basic packages
