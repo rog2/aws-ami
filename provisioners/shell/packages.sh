@@ -34,4 +34,4 @@ done
 
 # Upgrade packages on demand
 echo "Upgrading package: pip"
-sudo pip3 install --upgrade pip
+sudo python3 -m pip install --upgrade pip
