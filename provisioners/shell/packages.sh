@@ -31,3 +31,7 @@ for dep in $DEPS; do
     set +x
     fi
 done
+
+# Upgrade packages on demand
+echo "Upgrading package: pip"
+sudo python3 -m pip install --upgrade pip
