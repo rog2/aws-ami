@@ -23,7 +23,8 @@
         "Name": "{{user `ami_name`}}",
         "OS": "Ubuntu Server",
         "OS Version": "{{user `tag_os_version`}}",
-        "Base AMI": "{{user `source_ami`}}"
+        "Base AMI": "{{user `source_ami`}}",
+        "Base AMI Release": "{{user `source_ami_release`}}"
       }
     }],
     "provisioners": [{
