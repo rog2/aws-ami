@@ -25,6 +25,6 @@ systemctl restart chrony
 
 echo "Verifying Amazon Time Sync Service..."
 # waiting until source being determined
-sleep 10
+sleep 30
 chronyc tracking |grep $AMAZON_NTP_IP &> /dev/null
 echo "ok"
