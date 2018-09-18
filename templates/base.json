@@ -29,7 +29,10 @@
   }],
   "provisioners": [{
     "type": "shell",
-    "inline": ["sleep 10"]
+    "inline": [
+      "echo 'Wait 30 seconds for the OS to initialize...'",
+      "sleep 30"
+    ]
   }, {
     "type": "file",
     "source": "conf/pip",

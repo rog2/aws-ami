@@ -28,8 +28,8 @@
   "provisioners": [{
     "type": "shell",
     "inline": [
-      "echo 'Wait 10 seconds for the OS to initialize...'",
-      "sleep 10"
+      "echo 'Wait 30 seconds for the OS to initialize...'",
+      "sleep 30"
     ]
   }, {
     "type": "shell",

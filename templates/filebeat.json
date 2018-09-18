@@ -27,7 +27,10 @@
   }],
   "provisioners": [{
     "type": "shell",
-    "inline": ["sleep 10"]
+    "inline": [
+      "echo 'Wait 30 seconds for the OS to initialize...'",
+      "sleep 30"
+    ]
   }, {
     "type": "shell",
     "script": "provisioners/shell/elastic/apt-init.sh"
