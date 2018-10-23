@@ -41,7 +41,7 @@
   }, {
     "type": "shell",
     "script": "provisioners/shell/pip-source.sh",
-    "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }} {{user `region`}}"
+    "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }} {{user `region`}}"
   }, {
     "type": "shell",
     "script": "provisioners/shell/packages.sh"
