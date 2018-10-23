@@ -3,6 +3,7 @@
   "variables": {
     "region": "us-east-1",
     "source_ami": null,
+    "source_ami_release": null,
     "ami_name": "base-ubuntu-18.04-{{isotime \"20060102\"}}",
     "timezone": "Asia/Shanghai",
     "iam_instance_profile": "packer-ec2",

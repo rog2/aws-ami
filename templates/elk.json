@@ -3,8 +3,10 @@
     "variables": {
       "region": "us-east-1",
       "source_ami": null,
+      "source_ami_release": null,
       "ami_name": "elk-6.x-ubuntu-16.04-{{isotime \"20171115\"}}",
       "iam_instance_profile": "packer-ec2",
+      "tag_os_version": "18.04 LTS",
       "subnet_id": ""
     },
     "builders": [{
@@ -21,7 +23,7 @@
       "tags": {
         "Name": "{{user `ami_name`}}",
         "OS": "Ubuntu Server",
-        "OS Version": "16.04 LTS",
+        "OS Version": "{{user `tag_os_version`}}",
         "Base AMI": "{{user `source_ami`}}",
         "Base AMI Release": "{{user `source_ami_release`}}"
       }
