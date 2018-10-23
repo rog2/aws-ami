@@ -22,7 +22,8 @@
         "Name": "{{user `ami_name`}}",
         "OS": "Ubuntu Server",
         "OS Version": "16.04 LTS",
-        "Base AMI": "{{user `source_ami`}}"
+        "Base AMI": "{{user `source_ami`}}",
+        "Base AMI Release": "{{user `source_ami_release`}}"
       }
     }],
     "provisioners": [{
