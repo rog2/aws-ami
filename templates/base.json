@@ -54,7 +54,7 @@
     "script": "provisioners/shell/git.sh"
   }, {
     "type": "shell",
-    "script": "provisioners/shell/java8-oracle.sh"
+    "script": "provisioners/shell/java11-openjdk.sh"
   }, {
     "type": "shell",
     "script": "provisioners/shell/user.sh"
