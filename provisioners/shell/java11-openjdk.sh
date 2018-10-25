@@ -9,9 +9,8 @@ cd /tmp
 if [ ! -e $SOURCE_FILE ]; then
     wget $SOURCE_URL
 fi
-tar -zxf $SOURCE_FILE
 mkdir -p /opt/java/$SOURCE_FOLDER_NAME
-sudo mv -f $SOURCE_FOLDER_NAME/* /opt/java/$SOURCE_FOLDER_NAME/
+tar -zxf $SOURCE_FILE -C /opt/java
 
 sudo mkdir -p /usr/local/bin
 
