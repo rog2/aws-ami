@@ -12,9 +12,9 @@ fi
 mkdir -p /opt/java
 tar -zxf $SOURCE_FILE -C /opt/java
 
-sudo mkdir -p /usr/local/bin
+mkdir -p /usr/local/bin
 
 for bin in /opt/java/$SOURCE_FOLDER_NAME/bin/*; do
-    sudo update-alternatives --install /usr/local/bin/$(basename $bin) $(basename $bin) $bin 100;
-    sudo update-alternatives --set $(basename $bin) $bin;
+    update-alternatives --install /usr/local/bin/$(basename $bin) $(basename $bin) $bin 100;
+    update-alternatives --set $(basename $bin) $bin;
 done
