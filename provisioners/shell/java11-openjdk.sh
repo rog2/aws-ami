@@ -1,5 +1,6 @@
 #!/bin/bash -ex
 
+# This script needs run as ROOT.
 JAVA_VERSION=11.0.1
 SOURCE_URL=https://download.java.net/java/GA/jdk11/13/GPL/openjdk-"$JAVA_VERSION"_linux-x64_bin.tar.gz
 SOURCE_FILE=openjdk-"$JAVA_VERSION"_linux-x64_bin.tar.gz
