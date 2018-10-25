@@ -13,9 +13,7 @@ tar -zxf $SOURCE_FILE
 mkdir -p /opt/java/$SOURCE_FOLDER_NAME
 sudo mv -f $SOURCE_FOLDER_NAME/* /opt/java/$SOURCE_FOLDER_NAME/
 
-if [ ! -d /usr/local/bin ]; then
-    sudo mkdir -p /usr/local/bin
-fi
+sudo mkdir -p /usr/local/bin
 
 for bin in /opt/java/$SOURCE_FOLDER_NAME/bin/*; do
     sudo update-alternatives --install /usr/local/bin/$(basename $bin) $(basename $bin) $bin 100;
