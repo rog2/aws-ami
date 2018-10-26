@@ -11,7 +11,7 @@ if [ ! -e $SOURCE_FILE ]; then
     wget $SOURCE_URL
 fi
 mkdir -p /opt/java
-tar -zxf $SOURCE_FILE -C /opt/java
+tar -zxf $SOURCE_FILE -C /opt/java --no-same-owner
 
 mkdir -p /usr/local/bin
 
