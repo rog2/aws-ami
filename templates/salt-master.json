@@ -3,7 +3,6 @@
     "variables": {
       "region": "us-east-1",
       "source_ami": null,
-      "source_ami_release": null,
       "ami_name": "salt-master-ubuntu-18.04-{{isotime \"20060102\"}}",
       "iam_instance_profile": "packer-ec2",
       "tag_os_version": "18.04 LTS",
@@ -24,8 +23,7 @@
         "Name": "{{user `ami_name`}}",
         "OS": "Ubuntu Server",
         "OS Version": "{{user `tag_os_version`}}",
-        "Base AMI": "{{user `source_ami`}}",
-        "Base AMI Release": "{{user `source_ami_release`}}"
+        "Base AMI": "{{user `source_ami`}}"
       }
     }],
     "provisioners": [{
