@@ -49,9 +49,6 @@
     "script": "provisioners/shell/awscli.sh"
   }, {
     "type": "shell",
-    "script": "provisioners/shell/git.sh"
-  }, {
-    "type": "shell",
     "script": "provisioners/shell/java11-openjdk.sh",
     "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }}"
   }, {
@@ -99,7 +96,6 @@
     "inline": [
       "echo 'Validating provisioners...'",
       "aws --version",
-      "git --version",
       "java -version",
       "salt-minion --version",
       "filebeat version",
