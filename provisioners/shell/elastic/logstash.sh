@@ -9,7 +9,10 @@ fi
 echo "Installing logstash"
 sudo apt-get install -y logstash
 
-#sudo /usr/share/logstash/bin/logstash-plugin install x-pack
+echo "add logstash-output-amazon_es plugin"
+sudo /usr/share/logstash/bin/logstash-plugin install logstash-output-amazon_es
+
+echo "add logstash-filter-ruby plugin"
 sudo /usr/share/logstash/bin/logstash-plugin install logstash-filter-ruby
 
 sudo systemctl start logstash

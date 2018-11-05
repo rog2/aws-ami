@@ -1,0 +1,48 @@
+{
+    "description": "Logstash 6.x with java 8 and logstash-output-amazon_es plugin",
+    "variables": {
+      "region": "us-east-1",
+      "source_ami": null,
+      "ami_name": "elk-6.x-ubuntu-18.04-{{isotime \"20181105\"}}",
+      "iam_instance_profile": "packer-ec2",
+      "tag_os_version": "18.04 LTS",
+      "subnet_id": ""
+    },
+    "builders": [{
+      "type": "amazon-ebs",
+      "region": "{{user `region`}}",
+      "source_ami": "{{user `source_ami`}}",
+      "ami_name": "{{user `ami_name`}}",
+      "ami_description": "For logstash",
+      "instance_type": "t2.medium",
+      "iam_instance_profile": "{{user `iam_instance_profile`}}",
+      "ssh_username": "ubuntu",
+      "associate_public_ip_address": true,
+      "subnet_id": "{{user `subnet_id`}}",
+      "tags": {
+        "Name": "{{user `ami_name`}}",
+        "OS": "Ubuntu Server",
+        "OS Version": "{{user `tag_os_version`}}",
+        "Base AMI": "{{user `source_ami`}}"
+      }
+    }],
+    "provisioners": [{
+      "type": "shell",
+      "inline": [
+        "echo 'Wait 30 seconds for the OS to initialize...'",
+        "sleep 30"
+      ]
+    }, {
+      "type": "shell",
+      "script": "provisioners/shell/elastic/downgrade-java8-openjdk.sh"
+    }, {
+      "type": "shell",
+      "script": "provisioners/shell/elastic/logstash.sh"
+    }, {
+      "type": "shell",
+      "inline": [
+        "echo 'Remove ssh key to make the AMI more secure.'",
+        "rm -vf ~/.ssh/authorized_keys"
+      ]
+    }]
+  }
