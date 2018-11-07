@@ -34,13 +34,8 @@
       "sleep 30"
     ]
   }, {
-    "type": "file",
-    "source": "conf/pip",
-    "destination": "/tmp"
-  }, {
     "type": "shell",
-    "script": "provisioners/shell/pip-source.sh",
-    "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }} {{user `region`}}"
+    "script": "provisioners/shell/pip-source.sh"
   }, {
     "type": "shell",
     "script": "provisioners/shell/packages.sh"
