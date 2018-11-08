@@ -10,7 +10,7 @@ fi
 
 echo 'Stopping and diabling apport service..'
 systemctl stop apport.service
-/lib/systemd/systemd-sysv-install disable apport
+systemctl disable apport.service
 
 echo 'Configuring core pattern...'
 echo 'kernel.core_pattern=core.%p' > $CORE_PATTERN_CONF
@@ -18,5 +18,5 @@ echo 'kernel.core_pattern=core.%p' > $CORE_PATTERN_CONF
 sysctl -p $CORE_PATTERN_CONF
 
 echo 'Validating core pattern...'
-cat /proc/sys/kernel/core_pattern |grep 'core.%p'
+sysctl kernel.core_pattern
 echo 'ok'
