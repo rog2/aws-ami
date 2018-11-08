@@ -35,6 +35,9 @@
     }, {
       "type": "shell",
       "script": "provisioners/shell/elastic/apt-init.sh"
+    },{
+      "type": "shell",
+      "script": "provisioners/shell/elastic/downgrade-java8-openjdk.sh"
     }, {
       "type": "shell",
       "script": "provisioners/shell/elastic/elasticsearch.sh"
