@@ -63,7 +63,7 @@
     "script": "provisioners/shell/salt/salt-minion.sh"
   },{
     "type": "shell",
-    "script": "provisioners/shell/core-conf.sh",
+    "script": "provisioners/shell/core-pattern.sh",
     "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }}"
   },{
     "type": "shell",
