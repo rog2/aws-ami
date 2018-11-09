@@ -32,4 +32,3 @@ sed -i "s/__CONSUL_TAG_VALUE__/${consul_tag_value}/" ${CONSUL_CONFIG_DIR}/*.json
 systemctl daemon-reload
 systemctl enable consul.service
 systemctl start consul.service
-systemctl status consul.service
