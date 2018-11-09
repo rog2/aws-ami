@@ -7,21 +7,22 @@ SOURCE_FILE=openjdk-"$JAVA_VERSION"_linux-x64_bin.tar.gz
 SOURCE_FOLDER_NAME=jdk-$JAVA_VERSION
 
 download() {
+    url="$1"
     az=$(ec2metadata --availability-zone)
     if [[ $az != cn-* ]]; then
-        wget "$SOURCE_URL"
+        wget $url
     else
         MIRROR_S3_BUCKET=rog2
         MIRROR_S3_PREFIX=file-mirror
         MIRROR_S3_REGION=cn-north-1
-        s3_uri="s3://${MIRROR_S3_BUCKET}/${MIRROR_S3_PREFIX}/${SOURCE_URL#https://}"
+        s3_uri="s3://${MIRROR_S3_BUCKET}/${MIRROR_S3_PREFIX}/${url#https://}"
         aws s3 cp "${s3_uri}" . --region ${MIRROR_S3_REGION}
     fi
 }
 
 cd /tmp
 if [ ! -e $SOURCE_FILE ]; then
-    download
+    download $SOURCE_URL
 fi
 mkdir -p /opt/java
 tar -zxf $SOURCE_FILE -C /opt/java --no-same-owner
