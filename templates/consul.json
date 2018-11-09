@@ -1,0 +1,77 @@
+{
+  "description": "Consul (by Hashicorp)\n\nThis template builds an EC2 AMI for Consul server.",
+  "variables": {
+    "region": "null",
+    "subnet_id": "null",
+    "source_ami": "null",
+    "ami_name": "ubuntu/18.04/consul/{{isotime \"20060102\"}}",
+    "timezone": "Asia/Shanghai",
+    "iam_instance_profile": "packer-ec2",
+    "tag_os_version": "18.04 LTS"
+  },
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "region": "{{user `region`}}",
+      "source_ami": "{{user `source_ami`}}",
+      "ami_name": "{{user `ami_name`}}",
+      "ami_description": "The AMI that other AMIs based on.",
+      "instance_type": "t2.micro",
+      "iam_instance_profile": "{{user `iam_instance_profile`}}",
+      "ssh_username": "ubuntu",
+      "associate_public_ip_address": true,
+      "subnet_id": "{{user `subnet_id`}}",
+      "tags": {
+        "Name": "{{user `ami_name`}}",
+        "OS": "Ubuntu Server",
+        "OS Version": "{{user `tag_os_version`}}",
+        "Base AMI": "{{user `source_ami`}}"
+      }
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "echo 'Wait 30 seconds for the OS to initialize...'",
+        "sleep 30"
+      ]
+    },
+    {
+      "type": "shell",
+      "script": "provisioners/shell/consul.sh"
+    },
+    {
+      "type": "file",
+      "source": "cloud-init/consul.sh",
+      "destination": "/tmp/"
+    },
+    {
+      "type": "file",
+      "source": "conf/consul/consul.service",
+      "destination": "/tmp/"
+    },
+    {
+      "type": "file",
+      "source": "conf/consul/server.json",
+      "destination": "/tmp/"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "cd /tmp",
+        "sudo cp -vf server.json /etc/consul.d/server.json",
+        "sudo cp -vf consul.service /etc/systemd/system/consul.service",
+        "chmod 755 consul.sh",
+        "sudo cp -vf consul.sh /var/lib/cloud/scripts/per-instance/consul.sh"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "echo 'Remove ssh key to make the AMI more secure.'",
+        "rm -vf ~/.ssh/authorized_keys"
+      ]
+    }
+  ]
+}
