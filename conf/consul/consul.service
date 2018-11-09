@@ -1,0 +1,20 @@
+[Unit]
+Description=Consul by HashiCorp
+Documentation=https://www.consul.io/docs/index.html
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+# For Consul to bind to port 53 as a non-privileged user
+# See: https://www.consul.io/docs/guides/forwarding.html#systemd-resolved-setup
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+User=consul
+Group=consul
+ExecStart=/usr/local/bin/consul agent -config-dir=/etc/consul.d/
+ExecReload=/usr/local/bin/consul reload
+KillMode=process
+Restart=on-failure
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

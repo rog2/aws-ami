@@ -1,0 +1,12 @@
+{
+    "server": false,
+    "ui": false,
+    "data_dir": "/var/lib/consul",
+    "client_addr": "127.0.0.1",
+    "ports": {
+        "dns": 53
+    },
+    "retry_join": [
+        "provider=aws tag_key=consul-cluster tag_value=__CONSUL_TAG_VALUE__"
+    ]
+}
