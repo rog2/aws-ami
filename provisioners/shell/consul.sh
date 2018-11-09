@@ -16,14 +16,15 @@ CONSUL_DATA_DIR=/var/lib/consul
 # ==============================================================================
 
 function download() {
+    url="$1"
     az=$(ec2metadata --availability-zone)
     if [[ $az != cn-* ]]; then
-        wget "$1"
+        wget "$url"
     else
         MIRROR_S3_BUCKET=rog2
         MIRROR_S3_PREFIX=file-mirror
         MIRROR_S3_REGION=cn-north-1
-        s3_uri="s3://${MIRROR_S3_BUCKET}/${MIRROR_S3_PREFIX}/${CONSUL_DOWNLOAD_URL#https://}"
+        s3_uri="s3://${MIRROR_S3_BUCKET}/${MIRROR_S3_PREFIX}/${url#https://}"
         aws s3 cp "${s3_uri}" . --region ${MIRROR_S3_REGION}
     fi
 }
