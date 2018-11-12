@@ -1,9 +1,9 @@
 {
   "description": "Consul (by Hashicorp)\n\nThis template builds an EC2 AMI for Consul server.",
   "variables": {
-    "region": "null",
-    "subnet_id": "null",
-    "source_ami": "null",
+    "region": null,
+    "subnet_id": null,
+    "source_ami": null,
     "ami_name": "ubuntu/18.04/consul/{{isotime \"20060102\"}}",
     "timezone": "Asia/Shanghai",
     "iam_instance_profile": "packer-ec2",
