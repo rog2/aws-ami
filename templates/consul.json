@@ -1,5 +1,5 @@
 {
-  "description": "Consul (by HashiCorp)\n\nThis template builds an EC2 AMI for Consul server.",
+  "description": "Consul by HashiCorp\n\nThis template builds an EC2 AMI for Consul server.",
   "variables": {
     "region": null,
     "subnet_id": null,
@@ -14,7 +14,7 @@
       "region": "{{user `region`}}",
       "source_ami": "{{user `source_ami`}}",
       "ami_name": "{{user `ami_name`}}",
-      "ami_description": "The AMI that other AMIs based on.",
+      "ami_description": "Consul by HashiCorp",
       "instance_type": "t2.micro",
       "iam_instance_profile": "{{user `iam_instance_profile`}}",
       "ssh_username": "ubuntu",
