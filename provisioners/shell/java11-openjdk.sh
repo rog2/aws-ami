@@ -1,4 +1,6 @@
-#!/bin/bash -ex
+#!/bin/bash
+
+set -e
 
 # This script needs run as ROOT.
 JAVA_VERSION=11.0.1
@@ -6,17 +8,21 @@ SOURCE_URL=https://download.java.net/java/GA/jdk11/13/GPL/openjdk-"$JAVA_VERSION
 SOURCE_FILE=openjdk-"$JAVA_VERSION"_linux-x64_bin.tar.gz
 SOURCE_FOLDER_NAME=jdk-$JAVA_VERSION
 
-download() {
-    url="$1"
-    az=$(ec2metadata --availability-zone)
+function download {
+    # S3 bucket in AWS China region as a file mirror,
+    # which works around network connectivity issue caused by the GFW
+    local readonly CN_MIRROR_S3_BUCKET=rog2
+    local readonly CN_MIRROR_S3_PREFIX=file-mirror
+    local readonly CN_MIRROR_S3_REGION=cn-north-1
+
+    local readonly url="$1"
+    local readonly az=$(ec2metadata --availability-zone)
+
     if [[ $az != cn-* ]]; then
-        wget $url
+        curl -o $(basename "$url") "$url" --location --silent --fail --show-error
     else
-        MIRROR_S3_BUCKET=rog2
-        MIRROR_S3_PREFIX=file-mirror
-        MIRROR_S3_REGION=cn-north-1
-        s3_uri="s3://${MIRROR_S3_BUCKET}/${MIRROR_S3_PREFIX}/${url#https://}"
-        aws s3 cp "${s3_uri}" . --region ${MIRROR_S3_REGION}
+        local readonly s3_uri="s3://${CN_MIRROR_S3_BUCKET}/${CN_MIRROR_S3_PREFIX}/${url#https://}"
+        aws s3 cp "${s3_uri}" . --region ${CN_MIRROR_S3_REGION}
     fi
 }
 
