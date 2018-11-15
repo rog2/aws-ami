@@ -13,5 +13,5 @@ echo 'kernel.core_pattern=core.%p' | sudo tee $CORE_PATTERN_CONF
 sudo sysctl -p $CORE_PATTERN_CONF
 
 echo 'Validating core pattern...'
-sudo sysctl kernel.core_pattern
+sysctl kernel.core_pattern
 echo 'ok'

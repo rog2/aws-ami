@@ -6,9 +6,9 @@ set -e
 NAME=prometheus-node-exporter
 EXECUTABLE=/usr/local/bin/$NAME
 
-SOURCE_URL=https://github.com/prometheus/node_exporter/releases/download/v"$NODE_EXPORTER_VERSION"/node_exporter-"$NODE_EXPORTER_VERSION".linux-amd64.tar.gz
-SOURCE_FILE=node_exporter-"$NODE_EXPORTER_VERSION".linux-amd64.tar.gz
-SOURCE_FOLDER_NAME=$(basename "$SOURCE_FILE" .tar.gz)
+download_url=https://github.com/prometheus/node_exporter/releases/download/v"$NODE_EXPORTER_VERSION"/node_exporter-"$NODE_EXPORTER_VERSION".linux-amd64.tar.gz
+file_name=node_exporter-"$NODE_EXPORTER_VERSION".linux-amd64.tar.gz
+folder_name=$(basename "$folder_name" .tar.gz)
 
 function download {
     # S3 bucket in AWS China region as a file mirror,
@@ -30,9 +30,9 @@ function download {
 
 
 pushd /tmp
-    download "$SOURCE_URL"
-    tar zxfv "$SOURCE_FILE"
-    sudo cp -vf "$SOURCE_FOLDER_NAME/node_exporter" $EXECUTABLE
+    download "$download_url"
+    tar zxfv "$file_name"
+    sudo cp -vf "$folder_name/node_exporter" $EXECUTABLE
 popd
 
 # Creates user prometheus if not exist

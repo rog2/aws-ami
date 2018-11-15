@@ -29,7 +29,8 @@
       "Base AMI": "{{user `source_ami`}}"
     }
   }],
-  "provisioners": [{
+  "provisioners": [
+  {
     "type": "shell",
     "inline": [
       "echo 'Wait 30 seconds for the OS to initialize...'",
@@ -47,20 +48,32 @@
       "provisioners/shell/pip-source.sh",
       "provisioners/shell/packages.sh",
       "provisioners/shell/awscli.sh",
-      "provisioners/shell/java11-openjdk.sh",
       "provisioners/shell/user.sh",
       "provisioners/shell/journald-conf.sh",
       "provisioners/shell/apt-daily-conf.sh",
       "provisioners/shell/salt/salt-repo.sh",
       "provisioners/shell/salt/salt-minion.sh",
       "provisioners/shell/core-pattern.sh",
-      "provisioners/shell/timezone.sh",
       "provisioners/shell/chrony.sh",
       "provisioners/shell/cfn-helper-scripts.sh",
       "provisioners/shell/elastic/apt-init.sh",
-      "provisioners/shell/elastic/filebeat.sh",
-      "provisioners/shell/prometheus/node-exporter.sh"
+      "provisioners/shell/elastic/filebeat.sh"
     ]
+  },
+  {
+    "type": "shell",
+    "environment_vars": [ "JAVA_VERSION={{user `java_version`}}" ],
+    "script": "provisioners/shell/java11-openjdk.sh"
+  },
+  {
+    "type": "shell",
+    "environment_vars": [ "TIMEZONE={{user `timezone`}}" ],
+    "script": "provisioners/shell/timezone.sh"
+  },
+  {
+    "type": "shell",
+    "environment_vars": [ "NODE_EXPORTER_VERSION={{user `node_exporter_version`}}" ],
+    "script": "provisioners/shell/java11-openjdk.sh"
   },
   {
     "type": "shell",
@@ -74,5 +87,5 @@
       "echo 'Remove ssh key to make the AMI more secure.'",
       "rm -vf ~/.ssh/authorized_keys"
     ]
-  }
-]}
+  }]
+}
