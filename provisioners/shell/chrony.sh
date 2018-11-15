@@ -20,5 +20,5 @@ echo "'Wait 30 seconds for chrony to restart..."
 sleep 30
 
 echo "Verifying Amazon Time Sync Service"
-chronyc tracking |grep $AMAZON_NTP_IP &> /dev/null
+chronyc tracking | grep $AMAZON_NTP_IP &> /dev/null
 echo "ok"

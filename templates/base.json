@@ -39,11 +39,6 @@
   },
   {
     "type": "shell",
-    "environment_vars": [
-      "TIMEZONE={{user `timezone`}}",
-      "JAVA_VERSION={{user `java_version`}}",
-      "NODE_EXPORTER_VERSION={{user `node_exporter_version`}}"
-    ],
     "scripts": [
       "provisioners/shell/pip-source.sh",
       "provisioners/shell/packages.sh",
