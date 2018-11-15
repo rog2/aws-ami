@@ -6,19 +6,31 @@ set -e
 NAME=prometheus-node-exporter
 EXECUTABLE=/usr/local/bin/$NAME
 
-get_latest_release() {
-    curl -s https://api.github.com/repos/$1/releases/latest |
-        grep browser_download_url |
-        grep linux-amd64 |
-        sed -E 's/.*"([^"]+)".*/\1/'
+download_url=https://github.com/prometheus/node_exporter/releases/download/v"$NODE_EXPORTER_VERSION"/node_exporter-"$NODE_EXPORTER_VERSION".linux-amd64.tar.gz
+file_name=node_exporter-"$NODE_EXPORTER_VERSION".linux-amd64.tar.gz
+folder_name=$(basename "$folder_name" .tar.gz)
+
+function download {
+    # S3 bucket in AWS China region as a file mirror,
+    # which works around network connectivity issue caused by the GFW
+    local readonly CN_MIRROR_S3_BUCKET=rog2
+    local readonly CN_MIRROR_S3_PREFIX=file-mirror
+    local readonly CN_MIRROR_S3_REGION=cn-north-1
+
+    local readonly url="$1"
+    local readonly az=$(ec2metadata --availability-zone)
+
+    if [[ $az != cn-* ]]; then
+        curl -o $(basename "$url") "$url" --location --silent --fail --show-error
+    else
+        local readonly s3_uri="s3://${CN_MIRROR_S3_BUCKET}/${CN_MIRROR_S3_PREFIX}/${url#https://}"
+        aws s3 cp "${s3_uri}" . --region ${CN_MIRROR_S3_REGION}
+    fi
 }
 
-download_url=$(get_latest_release prometheus/node_exporter)
-file_name=$(basename "$download_url")
-folder_name=$(basename "$file_name" .tar.gz)
 
 pushd /tmp
-    wget "$download_url"
+    download "$download_url"
     tar zxfv "$file_name"
     sudo cp -vf "$folder_name/node_exporter" $EXECUTABLE
 popd

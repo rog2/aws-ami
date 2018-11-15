@@ -1,13 +1,15 @@
 {
-  "description": "This is a packer template for building an AMI that other AMIs based on.\nThe default source_ami is ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-20150731 (ami-4dfb5d26)",
+  "description": "This is a packer template for building an AMI that other AMIs based on.",
   "variables": {
-    "region": "us-east-1",
+    "region": null,
+    "subnet_id": null,
     "source_ami": null,
-    "ami_name": "base-ubuntu-18.04-{{isotime \"20060102\"}}",
-    "timezone": "Asia/Shanghai",
+    "ami_name": "ubuntu/18.04/base/{{isotime \"20060102\"}}/-b3",
     "iam_instance_profile": "packer-ec2",
     "tag_os_version": "18.04 LTS",
-    "subnet_id": ""
+    "timezone": "Asia/Shanghai",
+    "java_version": "11.0.1",
+    "node_exporter_version": "0.16.0"
   },
   "builders": [{
     "type": "amazon-ebs",
@@ -27,66 +29,48 @@
       "Base AMI": "{{user `source_ami`}}"
     }
   }],
-  "provisioners": [{
+  "provisioners": [
+  {
     "type": "shell",
     "inline": [
       "echo 'Wait 30 seconds for the OS to initialize...'",
       "sleep 30"
     ]
-  }, {
+  },
+  {
     "type": "shell",
-    "script": "provisioners/shell/pip-source.sh"
-  }, {
+    "scripts": [
+      "provisioners/shell/pip-source.sh",
+      "provisioners/shell/packages.sh",
+      "provisioners/shell/awscli.sh",
+      "provisioners/shell/user.sh",
+      "provisioners/shell/journald-conf.sh",
+      "provisioners/shell/apt-daily-conf.sh",
+      "provisioners/shell/salt/salt-repo.sh",
+      "provisioners/shell/salt/salt-minion.sh",
+      "provisioners/shell/core-pattern.sh",
+      "provisioners/shell/chrony.sh",
+      "provisioners/shell/cfn-helper-scripts.sh",
+      "provisioners/shell/elastic/apt-init.sh",
+      "provisioners/shell/elastic/filebeat.sh"
+    ]
+  },
+  {
     "type": "shell",
-    "script": "provisioners/shell/packages.sh"
-  }, {
+    "environment_vars": [ "JAVA_VERSION={{user `java_version`}}" ],
+    "script": "provisioners/shell/java11-openjdk.sh"
+  },
+  {
     "type": "shell",
-    "script": "provisioners/shell/awscli.sh"
-  }, {
+    "environment_vars": [ "TIMEZONE={{user `timezone`}}" ],
+    "script": "provisioners/shell/timezone.sh"
+  },
+  {
     "type": "shell",
-    "script": "provisioners/shell/java11-openjdk.sh",
-    "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }}"
-  }, {
-    "type": "shell",
-    "script": "provisioners/shell/user.sh"
-  }, {
-    "type": "shell",
-    "script": "provisioners/shell/journald-conf.sh"
-  }, {
-    "type": "shell",
-    "script": "provisioners/shell/apt-daily-conf.sh"
-  }, {
-    "type": "shell",
-    "script": "provisioners/shell/salt/salt-repo.sh"
-  },{
-    "type": "shell",
-    "script": "provisioners/shell/salt/salt-minion.sh"
-  },{
-    "type": "shell",
-    "script": "provisioners/shell/core-pattern.sh",
-    "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }}"
-  },{
-    "type": "shell",
-    "script": "provisioners/shell/timezone.sh",
-    "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }} {{user `timezone`}}"
-  },{
-    "type": "shell",
-    "script": "provisioners/shell/chrony.sh",
-    "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }}"
-  },{
-    "type": "shell",
-    "script": "provisioners/shell/cfn-helper-scripts.sh",
-    "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }} {{user `region`}}"
-  },{
-    "type": "shell",
-    "script": "provisioners/shell/elastic/apt-init.sh"
-  },{
-    "type": "shell",
-    "script": "provisioners/shell/elastic/filebeat.sh"
-  },{
-    "type": "shell",
-    "script": "provisioners/shell/prometheus/node-exporter.sh"
-  },{
+    "environment_vars": [ "NODE_EXPORTER_VERSION={{user `node_exporter_version`}}" ],
+    "script": "provisioners/shell/java11-openjdk.sh"
+  },
+  {
     "type": "shell",
     "inline": [
       "echo 'Validating provisioners...'",

@@ -3,10 +3,9 @@
 set -e
 
 # This script needs run as ROOT.
-JAVA_VERSION=11.0.1
-SOURCE_URL=https://download.java.net/java/GA/jdk11/13/GPL/openjdk-"$JAVA_VERSION"_linux-x64_bin.tar.gz
-SOURCE_FILE=openjdk-"$JAVA_VERSION"_linux-x64_bin.tar.gz
-SOURCE_FOLDER_NAME=jdk-$JAVA_VERSION
+download_url=https://download.java.net/java/GA/jdk11/13/GPL/openjdk-"$JAVA_VERSION"_linux-x64_bin.tar.gz
+file_name=openjdk-"$JAVA_VERSION"_linux-x64_bin.tar.gz
+folder_name=jdk-$JAVA_VERSION
 
 function download {
     # S3 bucket in AWS China region as a file mirror,
@@ -27,15 +26,15 @@ function download {
 }
 
 cd /tmp
-if [ ! -e $SOURCE_FILE ]; then
-    download $SOURCE_URL
+if [ ! -e $file_name ]; then
+    download $download_url
 fi
-mkdir -p /opt/java
-tar -zxf $SOURCE_FILE -C /opt/java --no-same-owner
+sudo mkdir -p /opt/java
+sudo tar -zxf $file_name -C /opt/java --no-same-owner
 
-mkdir -p /usr/local/bin
+sudo mkdir -p /usr/local/bin
 
-for bin in /opt/java/$SOURCE_FOLDER_NAME/bin/*; do
-    update-alternatives --install /usr/local/bin/$(basename $bin) $(basename $bin) $bin 100;
-    update-alternatives --set $(basename $bin) $bin;
+for bin in /opt/java/$folder_name/bin/*; do
+    sudo update-alternatives --install /usr/local/bin/$(basename $bin) $(basename $bin) $bin 100;
+    sudo update-alternatives --set $(basename $bin) $bin;
 done

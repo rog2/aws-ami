@@ -2,7 +2,9 @@
 
 sudo apt-get -y install python-setuptools
 
-if [[ $1 == cn-* ]]; then
+az=$(ec2metadata --availability-zone)
+
+if [[ $az == cn-* ]]; then
     #https://docs.amazonaws.cn/en_us/AWSCloudFormation/latest/UserGuide/cfn-helper-scripts-reference.html 
     sudo python -m easy_install "https://s3.cn-north-1.amazonaws.com.cn/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz"
 else
