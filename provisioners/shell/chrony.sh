@@ -16,8 +16,9 @@ echo "initstepslew 5 $AMAZON_NTP_IP" | sudo tee -a $CONF_FILE
 echo "Restarting Amazon Time Sync Service..."
 sudo systemctl restart chrony
 
-echo "Wait 10 seconds for chrony restart and then verifying Amazon Time Sync Service..."
-sleep 10
+echo "'Wait 30 seconds for chrony to restart..."
+sleep 30
 
+echo "Verifying Amazon Time Sync Service"
 chronyc tracking |grep $AMAZON_NTP_IP &> /dev/null
 echo "ok"
