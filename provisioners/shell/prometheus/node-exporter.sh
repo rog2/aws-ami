@@ -8,7 +8,7 @@ EXECUTABLE=/usr/local/bin/$NAME
 
 download_url=https://github.com/prometheus/node_exporter/releases/download/v"$NODE_EXPORTER_VERSION"/node_exporter-"$NODE_EXPORTER_VERSION".linux-amd64.tar.gz
 file_name=node_exporter-"$NODE_EXPORTER_VERSION".linux-amd64.tar.gz
-folder_name=$(basename "$folder_name" .tar.gz)
+folder_name=$(basename "$file_name" .tar.gz)
 
 # S3 bucket in AWS China region as a file mirror,
 # which works around network connectivity issue caused by the GFW

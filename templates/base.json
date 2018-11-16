@@ -70,7 +70,7 @@
   {
     "type": "shell",
     "environment_vars": [ "NODE_EXPORTER_VERSION={{user `node_exporter_version`}}" ],
-    "script": "provisioners/shell/java11-openjdk.sh"
+    "script": "provisioners/shell/prometheus/node-exporter.sh"
   },
   {
     "type": "file",
