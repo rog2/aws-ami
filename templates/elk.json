@@ -1,12 +1,11 @@
 {
-    "description": "ElasticSearch, Logstash and Kibana 6.x with x-pack",
+    "description": "Elasticsearch, Logstash and Kibana 6.x with X-Pack",
     "variables": {
-      "region": "us-east-1",
+      "region": null,
+      "subnet_id": null,
       "source_ami": null,
-      "ami_name": "elk-6.x-ubuntu-16.04-{{isotime \"20171115\"}}",
-      "iam_instance_profile": "packer-ec2",
-      "tag_os_version": "18.04 LTS",
-      "subnet_id": ""
+      "ami_name": "ubuntu/18.04/elk-6.x/{{isotime \"20060102\"}}",
+      "iam_instance_profile": "packer-ec2"
     },
     "builders": [{
       "type": "amazon-ebs",
@@ -21,9 +20,9 @@
       "subnet_id": "{{user `subnet_id`}}",
       "tags": {
         "Name": "{{user `ami_name`}}",
+        "Base AMI": "{{user `source_ami`}}",
         "OS": "Ubuntu Server",
-        "OS Version": "{{user `tag_os_version`}}",
-        "Base AMI": "{{user `source_ami`}}"
+        "OS Version": "18.04"
       }
     }],
     "provisioners": [{
