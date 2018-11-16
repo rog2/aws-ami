@@ -4,7 +4,7 @@
     "region": null,
     "subnet_id": null,
     "source_ami": null,
-    "ami_name": "ubuntu/18.04/base/{{isotime \"20060102\"}}/-b3",
+    "ami_name": "ubuntu/18.04/base/{{isotime \"20060102\"}}",
     "iam_instance_profile": "packer-ec2",
     "tag_os_version": "18.04 LTS",
     "timezone": "Asia/Shanghai",
@@ -40,6 +40,7 @@
   {
     "type": "shell",
     "scripts": [
+      "provisioners/shell/apt-upgrade.sh",
       "provisioners/shell/packages.sh",
       "provisioners/shell/pip-source.sh",
       "provisioners/shell/awscli.sh",
