@@ -40,8 +40,8 @@
   {
     "type": "shell",
     "scripts": [
-      "provisioners/shell/pip-source.sh",
       "provisioners/shell/packages.sh",
+      "provisioners/shell/pip-source.sh",
       "provisioners/shell/awscli.sh",
       "provisioners/shell/user.sh",
       "provisioners/shell/journald-conf.sh",
