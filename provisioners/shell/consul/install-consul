@@ -1,0 +1,261 @@
+#!/bin/bash
+#
+# Installs Consul on AWS EC2.
+#
+
+set -e
+
+# =============================================================================
+
+readonly CONSUL_USER="consul"
+readonly CONSUL_INSTALL_PATH="/opt/consul"
+readonly CONSUL_DOWNLOAD_PATH="/tmp/consul.zip"
+
+readonly SYSTEM_BIN_DIR="/usr/local/bin"
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly SCRIPT_NAME="$(basename "$0")"
+
+# =============================================================================
+
+function print_usage {
+  echo
+  echo "Usage: install-consul [OPTIONS]"
+  echo
+  echo "This script can be used to install Consul on AWS EC2."
+  echo
+  echo "Options:"
+  echo
+  echo -e "  --version\tThe version of Consul to install."
+  echo
+  echo "Example:"
+  echo
+  echo "  install-consul --version 1.4.0"
+}
+
+function log {
+  local readonly level="$1"
+  local readonly message="$2"
+  local readonly timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+  >&2 echo -e "${timestamp} [${level}] [$SCRIPT_NAME] ${message}"
+}
+
+function log_info {
+  local readonly message="$1"
+  log "INFO" "$message"
+}
+
+function log_warn {
+  local readonly message="$1"
+  log "WARN" "$message"
+}
+
+function log_error {
+  local readonly message="$1"
+  log "ERROR" "$message"
+}
+
+function assert_not_empty {
+  local readonly arg_name="$1"
+  local readonly arg_value="$2"
+
+  if [[ -z "$arg_value" ]]; then
+    log_error "The value for '$arg_name' cannot be empty"
+    print_usage
+    exit 1
+  fi
+}
+
+function assert_either_or {
+  local readonly arg1_name="$1"
+  local readonly arg1_value="$2"
+  local readonly arg2_name="$3"
+  local readonly arg2_value="$4"
+
+  if [[ -z "$arg1_value" && -z "$arg2_value" ]]; then
+    log_error "Either the value for '$arg1_name' or '$arg2_name' must be passed, both cannot be empty"
+    print_usage
+    exit 1
+  fi
+}
+
+function user_exists {
+  local readonly username="$1"
+  id "$username" >/dev/null 2>&1
+}
+
+function create_consul_user {
+  local readonly username="$1"
+
+  if $(user_exists "$username"); then
+    echo "User $username already exists. Will not create again."
+  else
+    log_info "Creating user named $username"
+    sudo adduser --system --group   \
+      --disabled-login              \
+      --no-create-home              \
+      --home /nonexistent           \
+      --shell /usr/sbin/nologin     \
+      --gecos "Consul by HashiCorp" \
+      $username
+  fi
+}
+
+function create_consul_install_paths {
+  local readonly path="$1"
+  local readonly username="$2"
+
+  log_info "Creating install dirs for Consul at $path"
+  sudo mkdir -p "$path"
+  sudo mkdir -p "$path/bin"
+  sudo mkdir -p "$path/config"
+  sudo mkdir -p "$path/data"
+
+  log_info "Changing ownership of $path to $username"
+  sudo chown -R "$username:$username" "$path"
+}
+
+# S3 bucket in AWS China region as a file mirror,
+# which works around network connectivity issue caused by the GFW
+function download {
+    local readonly url="$1"
+    local readonly local_path="$2"
+    local readonly az=$(ec2metadata --availability-zone)
+    if [[ $az != cn-* ]]; then
+        curl -o "$local_path" "$url" --location --silent --fail --show-error
+    else
+        local readonly s3_uri="s3://dl.seasungames.com/${url#https://}"
+        aws s3 cp "$s3_uri" "$local_path" --region cn-north-1
+    fi
+}
+
+function fetch_consul_binary {
+  local readonly version="$1"
+  local readonly download_url="https://releases.hashicorp.com/consul/${version}/consul_${version}_linux_amd64.zip"
+  log_info "Downloading Consul to $CONSUL_DOWNLOAD_PATH"
+  download "$download_url" "$CONSUL_DOWNLOAD_PATH"
+}
+
+function install_consul_binary {
+  local readonly install_path="$1"
+  local readonly username="$2"
+
+  local readonly bin_dir="$install_path/bin"
+  local readonly consul_dest_path="$bin_dir/consul"
+  local readonly run_consul_dest_path="$bin_dir/run-consul"
+
+  unzip -d /tmp "$CONSUL_DOWNLOAD_PATH"
+
+  log_info "Moving Consul binary to $consul_dest_path"
+  sudo mv "/tmp/consul" "$consul_dest_path"
+  sudo chown "$username:$username" "$consul_dest_path"
+  sudo chmod a+x "$consul_dest_path"
+
+  local readonly symlink_path="$SYSTEM_BIN_DIR/consul"
+  if [[ -f "$symlink_path" ]]; then
+    log_info "Symlink $symlink_path already exists. Will not add again."
+  else
+    log_info "Adding symlink to $consul_dest_path in $symlink_path"
+    sudo ln -s "$consul_dest_path" "$symlink_path"
+  fi
+
+  log_info "Copying Consul run script to $run_consul_dest_path"
+  sudo cp -vf "$SCRIPT_DIR/run-consul" "$run_consul_dest_path"
+  sudo chown "$username:$username" "$run_consul_dest_path"
+  sudo chmod a+x "$run_consul_dest_path"
+}
+
+function install_consul_service {
+  local readonly install_path="$1"
+  local readonly username="$2"
+
+  local readonly config_dir="$install_path/config"
+  local readonly consul_binary_path="$install_path/bin/consul"
+
+  log_info "Installing Consul systemd service"
+  sudo tee /etc/systemd/system/consul.service << EOF
+[Unit]
+Description=Consul by HashiCorp
+Documentation=https://www.consul.io/docs/index.html
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+# For Consul to bind to port 53 as a non-privileged user
+# See: https://www.consul.io/docs/guides/forwarding.html#systemd-resolved-setup
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+User=$username
+Group=$username
+ExecStart=$consul_binary_path agent -config-dir=$config_dir
+ExecReload=$consul_binary_path reload
+KillMode=process
+Restart=on-failure
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+EOF
+}
+
+# Ask systemd-resolved to forward 'consul' domain queries to localhost consul.service
+# See: https://www.consul.io/docs/guides/forwarding.html#systemd-resolved-setup
+function setup_systemd_resolved {
+  sudo mkdir -p /etc/systemd/resolved.conf.d
+  sudo tee /etc/systemd/resolved.conf.d/consul.conf << EOF
+[Resolve]
+DNS=127.0.0.1
+Domains=~consul
+EOF
+}
+
+# =============================================================================
+
+function install {
+  local version=""
+  local path="$CONSUL_INSTALL_PATH"
+  local user="$CONSUL_USER"
+
+  while [[ $# > 0 ]]; do
+    local key="$1"
+
+    case "$key" in
+      --version)
+        version="$2"
+        shift
+        ;;
+      --help)
+        print_usage
+        exit
+        ;;
+      *)
+        log_error "Unrecognized argument: $key"
+        print_usage
+        exit 1
+        ;;
+    esac
+
+    shift
+  done
+
+  assert_not_empty "--version" "$version"
+
+  log_info "Starting Consul install"
+
+  create_consul_user "$user"
+  create_consul_install_paths "$path" "$user"
+
+  fetch_consul_binary "$version"
+  install_consul_binary "$path" "$user"
+  install_consul_service  "$path" "$user"
+
+  setup_systemd_resolved
+
+  if command -v consul; then
+    log_info "Consul install complete!"
+  else
+    log_error "Could not find consul command. Aborting."
+    exit 1
+  fi
+}
+
+install "$@"

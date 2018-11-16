@@ -1,0 +1,338 @@
+#!/bin/bash
+#
+# Configure and run Consul on an AWS EC2.
+#
+# This script is expected to be run as "root" via EC2 User Data.
+#
+
+set -e
+
+# =============================================================================
+
+readonly CONSUL_USER="consul"
+readonly CONSUL_INSTALL_PATH="/opt/consul"
+readonly CONSUL_CONFIG_FILE="default.json"
+
+readonly EC2_INSTANCE_METADATA_URL="http://169.254.169.254/latest/meta-data"
+readonly EC2_INSTANCE_DYNAMIC_DATA_URL="http://169.254.169.254/latest/dynamic"
+
+readonly AWS_ASG_TAG_KEY="aws:autoscaling:groupName"
+
+readonly MAX_RETRIES=30
+readonly SLEEP_BETWEEN_RETRIES_SEC=10
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly SCRIPT_NAME="$(basename "$0")"
+
+# =============================================================================
+
+function print_usage {
+  echo
+  echo "Usage: run-consul [OPTIONS]"
+  echo
+  echo "This script is used to configure and run Consul on AWS EC2."
+  echo
+  echo "Options:"
+  echo
+  echo -e "  --server\t\tIf set, run in server mode. Optional. Exactly one of --server or --client must be set."
+  echo -e "  --client\t\tIf set, run in client mode. Optional. Exactly one of --server or --client must be set."
+  echo -e "  --cluster-tag-key\tAutomatically form a cluster with Instances that have this tag key and the tag value in --cluster-tag-value. Optional."
+  echo -e "  --cluster-tag-value\tAutomatically form a cluster with Instances that have the tag key in --cluster-tag-key and this tag value. Optional."
+  echo -e "  --datacenter\t\tThe name of the datacenter Consul is running in. Optional. If not specified, will default to AWS region name."
+  echo
+  echo
+  echo "Example:"
+  echo
+  echo "  run-consul --server --cluster-tag-key ConsulCluster --cluster-tag-value HashiCorp"
+}
+
+function log {
+  local readonly level="$1"
+  local readonly message="$2"
+  local readonly timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+  >&2 echo -e "${timestamp} [${level}] [$SCRIPT_NAME] ${message}"
+}
+
+function log_info {
+  local readonly message="$1"
+  log "INFO" "$message"
+}
+
+function log_warn {
+  local readonly message="$1"
+  log "WARN" "$message"
+}
+
+function log_error {
+  local readonly message="$1"
+  log "ERROR" "$message"
+}
+
+function assert_not_empty {
+  local readonly arg_name="$1"
+  local readonly arg_value="$2"
+
+  if [[ -z "$arg_value" ]]; then
+    log_error "The value for '$arg_name' cannot be empty"
+    print_usage
+    exit 1
+  fi
+}
+
+function assert_either_or {
+  local readonly arg1_name="$1"
+  local readonly arg1_value="$2"
+  local readonly arg2_name="$3"
+  local readonly arg2_value="$4"
+
+  if [[ -z "$arg1_value" && -z "$arg2_value" ]]; then
+    log_error "Either the value for '$arg1_name' or '$arg2_name' must be passed, both cannot be empty"
+    print_usage
+    exit 1
+  fi
+}
+
+function assert_is_installed {
+  local readonly name="$1"
+
+  if [[ ! $(command -v ${name}) ]]; then
+    log_error "The binary '$name' is required by this script but is not installed or in the system's PATH."
+    exit 1
+  fi
+}
+
+function lookup_path_in_instance_metadata {
+  local readonly path="$1"
+  curl --silent --show-error --location "$EC2_INSTANCE_METADATA_URL/$path/"
+}
+
+function lookup_path_in_instance_dynamic_data {
+  local readonly path="$1"
+  curl --silent --show-error --location "$EC2_INSTANCE_DYNAMIC_DATA_URL/$path/"
+}
+
+function get_instance_ip_address {
+  lookup_path_in_instance_metadata "local-ipv4"
+}
+
+function get_instance_id {
+  lookup_path_in_instance_metadata "instance-id"
+}
+
+function get_instance_region {
+  lookup_path_in_instance_dynamic_data "instance-identity/document" | jq -r ".region"
+}
+
+function get_instance_tags {
+  local readonly instance_id="$1"
+  local readonly instance_region="$2"
+  local tags=""
+  local count_tags=""
+
+  log_info "Looking up tags for Instance $instance_id in $instance_region"
+  for (( i=1; i<="$MAX_RETRIES"; i++ )); do
+    tags=$(aws ec2 describe-tags \
+      --region "$instance_region" \
+      --filters "Name=resource-type,Values=instance" "Name=resource-id,Values=${instance_id}")
+    count_tags=$(echo $tags | jq -r ".Tags? | length")
+    if [[ "$count_tags" -gt 0 ]]; then
+      log_info "This Instance $instance_id in $instance_region has Tags."
+      echo "$tags"
+      return
+    else
+      log_warn "This Instance $instance_id in $instance_region does not have any Tags."
+      log_warn "Will sleep for $SLEEP_BETWEEN_RETRIES_SEC seconds and try again."
+      sleep "$SLEEP_BETWEEN_RETRIES_SEC"
+    fi
+  done
+
+  log_error "Could not find Instance Tags for $instance_id in $instance_region after $MAX_RETRIES retries."
+  exit 1
+}
+
+function get_asg_size {
+  local readonly asg_name="$1"
+  local readonly aws_region="$2"
+  local asg_json=""
+
+  log_info "Looking up the size of the Auto Scaling Group $asg_name in $aws_region"
+  asg_json=$(aws autoscaling describe-auto-scaling-groups --region "$aws_region" --auto-scaling-group-names "$asg_name")
+  echo "$asg_json" | jq -r '.AutoScalingGroups[0].DesiredCapacity'
+}
+
+function get_cluster_size {
+  local readonly instance_tags="$1"
+  local readonly aws_region="$2"
+
+  local asg_name=""
+  asg_name=$(get_tag_value "$instance_tags" "$AWS_ASG_TAG_KEY")
+  if [[ -z "$asg_name" ]]; then
+    log_warn "This EC2 Instance does not appear to be part of an Auto Scaling Group, so cannot determine cluster size. Setting cluster size to 1."
+    echo 1
+  else
+    get_asg_size "$asg_name" "$aws_region"
+  fi
+}
+
+# Get the value for a specific tag from the tags JSON returned by the AWS describe-tags:
+# https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-tags.html
+function get_tag_value {
+  local readonly tags="$1"
+  local readonly tag_key="$2"
+
+  echo "$tags" | jq -r ".Tags[] | select(.Key == \"$tag_key\") | .Value"
+}
+
+function generate_consul_config {
+  local readonly server="${1}"
+  local readonly config_dir="${2}"
+  local readonly data_dir="${3}"
+  local readonly user="${4}"
+  local readonly cluster_tag_key="${5}"
+  local readonly cluster_tag_value="${6}"
+  local readonly datacenter="${7}"
+
+  local readonly config_path="$config_dir/$CONSUL_CONFIG_FILE"
+
+  local instance_id=""
+  local instance_ip_address=""
+  local instance_region=""
+  local ui="false"
+
+  instance_id=$(get_instance_id)
+  instance_ip_address=$(get_instance_ip_address)
+  instance_region=$(get_instance_region)
+
+  local retry_join_json=""
+  if [[ -z "$cluster_tag_key" || -z "$cluster_tag_value" ]]; then
+    log_warn "Either the cluster tag key ($cluster_tag_key) or value ($cluster_tag_value) is empty. Will not automatically try to form a cluster based on EC2 tags."
+  else
+    retry_join_json=$(cat <<EOF
+"retry_join": ["provider=aws region=$instance_region tag_key=$cluster_tag_key tag_value=$cluster_tag_value"],
+EOF
+)
+  fi
+
+  local bootstrap_expect=""
+  if [[ "$server" == "true" ]]; then
+    local instance_tags=""
+    local cluster_size=""
+
+    instance_tags=$(get_instance_tags "$instance_id" "$instance_region")
+    cluster_size=$(get_cluster_size "$instance_tags" "$instance_region")
+
+    bootstrap_expect="\"bootstrap_expect\": $cluster_size,"
+    ui="true"
+  fi
+
+  log_info "Creating default Consul configuration"
+  local default_config_json=$(cat <<EOF
+{
+  "server": $server,
+  "data_dir": "$data_dir",
+  "advertise_addr": "$instance_ip_address",
+  "bind_addr": "$instance_ip_address",
+  "client_addr": "0.0.0.0",
+  "addresses": {
+    "dns": "127.0.0.1"
+  },
+  "ports": {
+    "dns": 53
+  },
+  "datacenter": "$datacenter",
+  "node_name": "$instance_id",
+  $bootstrap_expect
+  $retry_join_json
+  "ui": $ui
+}
+EOF
+)
+  log_info "Installing Consul config file in $config_path"
+  echo "$default_config_json" | jq '.' > "$config_path"
+  chown "$user:$user" "$config_path"
+}
+
+function start_consul {
+  log_info "Starting Systemd Consul service"
+  systemctl daemon-reload
+  systemctl enable consul.service
+  systemctl start consul.service
+}
+
+# =============================================================================
+
+function run {
+  local server="false"
+  local client="false"
+  local user="$CONSUL_USER"
+  local config_dir="$CONSUL_INSTALL_PATH/config"
+  local data_dir="$CONSUL_INSTALL_PATH/data"
+  local cluster_tag_key=""
+  local cluster_tag_value=""
+  local datacenter=""
+
+  while [[ $# > 0 ]]; do
+    local key="$1"
+
+    case "$key" in
+      --server)
+        server="true"
+        ;;
+      --client)
+        client="true"
+        ;;
+      --cluster-tag-key)
+        assert_not_empty "$key" "$2"
+        cluster_tag_key="$2"
+        shift
+        ;;
+      --cluster-tag-value)
+        assert_not_empty "$key" "$2"
+        cluster_tag_value="$2"
+        shift
+        ;;
+      --datacenter)
+        assert_not_empty "$key" "$2"
+        datacenter="$2"
+        shift
+        ;;
+      --help)
+        print_usage
+        exit
+        ;;
+      *)
+        log_error "Unrecognized argument: $key"
+        print_usage
+        exit 1
+        ;;
+    esac
+
+    shift
+  done
+
+  if [[ ("$server" == "true" && "$client" == "true") || ("$server" == "false" && "$client" == "false") ]]; then
+    log_error "Exactly one of --server or --client must be set."
+    exit 1
+  fi
+
+  assert_is_installed "aws"
+  assert_is_installed "curl"
+  assert_is_installed "jq"
+
+  if [[ -z "$datacenter" ]]; then
+    datacenter=$(get_instance_region)
+  fi
+
+  generate_consul_config \
+    "$server" \
+    "$config_dir" \
+    "$data_dir" \
+    "$user" \
+    "$cluster_tag_key" \
+    "$cluster_tag_value" \
+    "$datacenter"
+
+  start_consul
+}
+
+run "$@"
