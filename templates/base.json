@@ -1,12 +1,11 @@
 {
-  "description": "This is a packer template for building an AMI that other AMIs based on.",
+  "description": "The Golden Image which has all common packages installed.\nBased on Ubuntu Server 18.04",
   "variables": {
     "region": null,
     "subnet_id": null,
     "source_ami": null,
     "ami_name": "ubuntu/18.04/base/{{isotime \"20060102\"}}",
     "iam_instance_profile": "packer-ec2",
-    "tag_os_version": "18.04 LTS",
     "timezone": "Asia/Shanghai",
     "java_version": "11.0.1",
     "node_exporter_version": "0.16.0",
@@ -25,9 +24,15 @@
     "subnet_id": "{{user `subnet_id`}}",
     "tags": {
       "Name": "{{user `ami_name`}}",
+      "Base AMI": "{{user `source_ami`}}",
       "OS": "Ubuntu Server",
-      "OS Version": "{{user `tag_os_version`}}",
-      "Base AMI": "{{user `source_ami`}}"
+      "OS Version": "18.04",
+      "Timezone": "{{user `timezone`}}",
+      "Java Version": "{{user `java_version`}}",
+      "Prometheus Node Exporter Version": "{{user `node_exporter_version`}}",
+      "Salt Version": "2018.3",
+      "Filebeat Version": "6.x",
+      "Consul Version": "{{user `consul_version`}}"
     }
   }],
   "provisioners": [
@@ -94,6 +99,7 @@
       "salt-minion --version",
       "filebeat version",
       "prometheus-node-exporter --version",
+      "consul --version",
       "echo 'Remove ssh key to make the AMI more secure.'",
       "rm -vf ~/.ssh/authorized_keys"
     ]
