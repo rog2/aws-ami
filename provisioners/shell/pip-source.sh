@@ -4,7 +4,7 @@ set -e
 
 # Use pip mirror from tsinghua university if we are in China region,
 # This works around network connectivity issue caused by the GFW.
-local readonly az=$(ec2metadata --availability-zone)
+readonly az=$(ec2metadata --availability-zone)
 if [[ $az == cn-* ]]; then
   mkdir -p ~/.pip
   tee ~/.pip/pip.conf << EOF
