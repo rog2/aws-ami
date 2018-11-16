@@ -10,27 +10,22 @@ download_url=https://github.com/prometheus/node_exporter/releases/download/v"$NO
 file_name=node_exporter-"$NODE_EXPORTER_VERSION".linux-amd64.tar.gz
 folder_name=$(basename "$folder_name" .tar.gz)
 
+# S3 bucket in AWS China region as a file mirror,
+# which works around network connectivity issue caused by the GFW
 function download {
-    # S3 bucket in AWS China region as a file mirror,
-    # which works around network connectivity issue caused by the GFW
-    local readonly CN_MIRROR_S3_BUCKET=rog2
-    local readonly CN_MIRROR_S3_PREFIX=file-mirror
-    local readonly CN_MIRROR_S3_REGION=cn-north-1
-
     local readonly url="$1"
+    local readonly local_path="$2"
     local readonly az=$(ec2metadata --availability-zone)
-
     if [[ $az != cn-* ]]; then
-        curl -o $(basename "$url") "$url" --location --silent --fail --show-error
+        curl -o "$local_path" "$url" --location --silent --fail --show-error
     else
-        local readonly s3_uri="s3://${CN_MIRROR_S3_BUCKET}/${CN_MIRROR_S3_PREFIX}/${url#https://}"
-        aws s3 cp "${s3_uri}" . --region ${CN_MIRROR_S3_REGION}
+        local readonly s3_uri="s3://dl.seasungames.com/${url#https://}"
+        aws s3 cp "$s3_uri" "$local_path" --region cn-north-1
     fi
 }
 
-
 pushd /tmp
-    download "$download_url"
+    download "$download_url" "$file_name"
     tar zxfv "$file_name"
     sudo cp -vf "$folder_name/node_exporter" $EXECUTABLE
 popd
