@@ -6,6 +6,7 @@ set -e
 download_url=https://download.java.net/java/GA/jdk11/13/GPL/openjdk-"$JAVA_VERSION"_linux-x64_bin.tar.gz
 file_name=openjdk-"$JAVA_VERSION"_linux-x64_bin.tar.gz
 folder_name=jdk-$JAVA_VERSION
+JVM_FOLDER=/usr/lib/jvm
 
 # S3 bucket in AWS China region as a file mirror,
 # which works around network connectivity issue caused by the GFW
@@ -25,12 +26,12 @@ cd /tmp
 if [ ! -e $file_name ]; then
     download $download_url $file_name
 fi
-sudo mkdir -p /opt/java
-sudo tar -zxf $file_name -C /opt/java --no-same-owner
+sudo mkdir -p $JVM_FOLDER
+sudo tar -zxf $file_name -C $JVM_FOLDER --no-same-owner
 
 sudo mkdir -p /usr/local/bin
 
-for bin in /opt/java/$folder_name/bin/*; do
+for bin in $JVM_FOLDER/$folder_name/bin/*; do
     sudo update-alternatives --install /usr/local/bin/$(basename $bin) $(basename $bin) $bin 100;
     sudo update-alternatives --set $(basename $bin) $bin;
 done
