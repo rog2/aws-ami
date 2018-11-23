@@ -1,0 +1,297 @@
+#!/bin/bash
+#
+# Configure and run Nomad on an AWS EC2.
+#
+# This script is expected to be run as "root" via EC2 User Data.
+#
+
+set -e
+
+# =============================================================================
+
+readonly NOMAD_USER="nomad"
+readonly NOMAD_INSTALL_PATH="/opt/nomad"
+readonly NOMAD_CONFIG_FILE="default.hcl"
+
+readonly EC2_INSTANCE_METADATA_URL="http://169.254.169.254/latest/meta-data"
+readonly EC2_INSTANCE_DYNAMIC_DATA_URL="http://169.254.169.254/latest/dynamic"
+
+# =============================================================================
+
+function print_usage {
+  echo
+  echo "Usage: run-nomad [OPTIONS]"
+  echo
+  echo "This script is used to configure and run Nomad on an AWS server."
+  echo
+  echo "Options:"
+  echo
+  echo -e "  --server\t\tIf set, run in server mode. Optional. At least one of --server or --client must be set."
+  echo -e "  --client\t\tIf set, run in client mode. Optional. At least one of --server or --client must be set."
+  echo -e "  --num-servers\t\tThe number of servers to expect in the Nomad cluster. Required if --server is true."
+  echo
+  echo "Example:"
+  echo
+  echo "  run-nomad --server --num-servers 3"
+}
+
+function log {
+  local readonly level="$1"
+  local readonly message="$2"
+  local readonly timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+  >&2 echo -e "${timestamp} [${level}] [$SCRIPT_NAME] ${message}"
+}
+
+function log_info {
+  local readonly message="$1"
+  log "INFO" "$message"
+}
+
+function log_warn {
+  local readonly message="$1"
+  log "WARN" "$message"
+}
+
+function log_error {
+  local readonly message="$1"
+  log "ERROR" "$message"
+}
+
+function assert_not_empty {
+  local readonly arg_name="$1"
+  local readonly arg_value="$2"
+
+  if [[ -z "$arg_value" ]]; then
+    log_error "The value for '$arg_name' cannot be empty"
+    print_usage
+    exit 1
+  fi
+}
+
+function lookup_path_in_instance_metadata {
+  local readonly path="$1"
+  curl --silent --location "$EC2_INSTANCE_METADATA_URL/$path/"
+}
+
+function lookup_path_in_instance_dynamic_data {
+  local readonly path="$1"
+  curl --silent --location "$EC2_INSTANCE_DYNAMIC_DATA_URL/$path/"
+}
+
+function get_instance_ip_address {
+  lookup_path_in_instance_metadata "local-ipv4"
+}
+
+function get_instance_id {
+  lookup_path_in_instance_metadata "instance-id"
+}
+
+function get_instance_availability_zone {
+  lookup_path_in_instance_metadata "placement/availability-zone"
+}
+
+function get_instance_region {
+  lookup_path_in_instance_dynamic_data "instance-identity/document" | jq -r ".region"
+}
+
+function get_instance_meta_availability {
+  local readonly public_ipv4=$(lookup_path_in_instance_metadata "public-ipv4")
+  if [[ -z "$public_ipv4" ]]; then
+    echo "private"
+  else
+    echo "public"
+  fi
+}
+
+function assert_is_installed {
+  local readonly name="$1"
+
+  if [[ ! $(command -v ${name}) ]]; then
+    log_error "The binary '$name' is required by this script but is not installed or in the system's PATH."
+    exit 1
+  fi
+}
+
+function generate_nomad_config {
+  local readonly server="$1"
+  local readonly client="$2"
+  local readonly num_servers="$3"
+  local readonly config_dir="$4"
+  local readonly data_dir="$5"
+  local readonly user="$6"
+  local readonly config_path="$config_dir/$NOMAD_CONFIG_FILE"
+
+  local instance_id=""
+  local instance_ip_address=""
+  local instance_region=""
+  local instance_availability_zone=""
+
+  instance_id=$(get_instance_id)
+  instance_ip_address=$(get_instance_ip_address)
+  instance_region=$(get_instance_region)
+  availability_zone=$(get_instance_availability_zone)
+
+  local server_config=""
+  if [[ "$server" == "true" ]]; then
+    server_config=$(cat <<EOF
+server {
+  enabled = true
+  bootstrap_expect = $num_servers
+}
+EOF
+)
+  fi
+
+  local client_config=""
+  if [[ "$client" == "true" ]]; then
+    # We need this meta to constraint some jobs to run on nodes with public IP addresses
+    # https://github.com/hashicorp/nomad/issues/646
+    local readonly meta_availability=$(get_instance_meta_availability)
+    client_config=$(cat <<EOF
+client {
+  enabled = true
+  meta {
+    "availability" = "$meta_availability"
+  }
+}
+EOF
+)
+  fi
+
+  log_info "Creating default Nomad config file in $config_path"
+  cat > "$config_path" <<EOF
+data_dir   = "$data_dir"
+region     = "$instance_region"
+datacenter = "$availability_zone"
+name       = "$instance_id"
+bind_addr  = "0.0.0.0"
+
+advertise {
+  http = "$instance_ip_address"
+  rpc  = "$instance_ip_address"
+  serf = "$instance_ip_address"
+}
+
+consul {
+  address = "127.0.0.1:8500"
+}
+
+$client_config
+$server_config
+EOF
+  chown "$user:$user" "$config_path"
+}
+
+# Systemd service file based on:
+# https://github.com/hashicorp/nomad/blob/master/dist/systemd/nomad.service
+function generate_systemd_config {
+  local readonly username="$1"
+  local readonly bin_dir="$2"
+  local readonly config_dir="$3"
+
+  local readonly nomad_binary_path="$bin_dir/nomad"
+
+  log_info "Installing Nomad systemd service"
+  cat > /etc/systemd/system/nomad.service <<EOF
+[Unit]
+Description=Nomad by HashiCorp
+Documentation=https://nomadproject.io/docs/
+Wants=network-online.target
+After=network-online.target
+# We run Consul on every Nomad node.
+Wants=consul.service
+After=consul.service
+
+[Service]
+User=$username
+Group=$username
+KillMode=process
+KillSignal=SIGINT
+ExecStart=$nomad_binary_path agent -config=$config_dir
+ExecReload=/bin/kill -HUP \$MAINPID
+Restart=on-failure
+RestartSec=2
+StartLimitBurst=3
+StartLimitIntervalSec=10
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+EOF
+}
+
+function start_nomad {
+  log_info "Starting Systemd Nomad service"
+  systemctl daemon-reload
+  systemctl enable nomad.service
+  systemctl start nomad.service
+}
+
+# =============================================================================
+
+function run {
+  local server="false"
+  local client="false"
+  local num_servers=""
+  local user=""
+
+  local readonly bin_dir="$NOMAD_INSTALL_PATH/bin"
+  local readonly config_dir="$NOMAD_INSTALL_PATH/config"
+  local readonly data_dir="$NOMAD_INSTALL_PATH/data"
+
+  while [[ $# > 0 ]]; do
+    local key="$1"
+
+    case "$key" in
+      --server)
+        server="true"
+        ;;
+      --client)
+        client="true"
+        ;;
+      --num-servers)
+        num_servers="$2"
+        shift
+        ;;
+      --help)
+        print_usage
+        exit
+        ;;
+      *)
+        log_error "Unrecognized argument: $key"
+        print_usage
+        exit 1
+        ;;
+    esac
+
+    shift
+  done
+
+  if [[ "$server" == "true" ]]; then
+    assert_not_empty "--num-servers" "$num_servers"
+  fi
+
+  if [[ "$server" == "false" && "$client" == "false" ]]; then
+    log_error "At least one of --server or --client must be set"
+    exit 1
+  fi
+
+  # Nomad clients make use of operating system primitives for resource isolation that require elevated (root) permissions,
+  # Nomad servers don't need root-level privileges.
+  if [[ "$client" == "true" ]]; then
+    user="root"
+  else
+    user="$NOMAD_USER"
+  fi
+
+  assert_is_installed "aws"
+  assert_is_installed "curl"
+  assert_is_installed "jq"
+
+  generate_nomad_config "$server" "$client" "$num_servers" "$config_dir" "$data_dir" "$user"
+  generate_systemd_config "$user" "$bin_dir" "$config_dir"
+
+  start_nomad
+}
+
+run "$@"
