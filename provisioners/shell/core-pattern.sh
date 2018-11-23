@@ -1,7 +1,9 @@
-#!/bin/bash -e
+#!/bin/bash
+
+set -e
 
 # needs run as root.
-CORE_PATTERN_CONF=/etc/sysctl.d/98-seasungames-core-pattern.conf
+readonly CORE_PATTERN_CONF=/etc/sysctl.d/98-seasungames-core-pattern.conf
 
 echo 'Stopping and diabling apport service..'
 sudo systemctl stop apport.service

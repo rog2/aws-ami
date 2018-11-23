@@ -2,22 +2,22 @@
 
 set -e
 
-get_latest_release() {
-    curl -s https://api.github.com/repos/$1/releases/latest |
-        grep browser_download_url |
-        grep linux-amd64 |
-        sed -E 's/.*"([^"]+)".*/\1/'
+function get_latest_release {
+  curl -s https://api.github.com/repos/$1/releases/latest |
+    grep browser_download_url |
+    grep linux-amd64 |
+    sed -E 's/.*"([^"]+)".*/\1/'
 }
 
 # Creates user prometheus if not exist
-if ! id -u prometheus > /dev/null 2>&1; then
-    sudo adduser --system --group       \
-        --disabled-login                \
-        --no-create-home                \
-        --home /nonexistent             \
-        --shell /usr/sbin/nologin       \
-        --gecos "Prometheus Monitoring" \
-        prometheus
+if [[ "! id -u prometheus > /dev/null 2>&1" ]]; then
+  sudo adduser --system --group     \
+    --disabled-login                \
+    --no-create-home                \
+    --home /nonexistent             \
+    --shell /usr/sbin/nologin       \
+    --gecos "Prometheus Monitoring" \
+    prometheus
 fi
 
 download_url=$(get_latest_release prometheus/prometheus)
@@ -25,29 +25,29 @@ file_name=$(basename "$download_url")
 folder_name=$(basename "$file_name" .tar.gz)
 
 pushd /tmp
-    wget "$download_url"
-    tar zxfv "$file_name"
+  wget "$download_url"
+  tar zxfv "$file_name"
 
-    # Binaries
-    sudo cp -vf "$folder_name/prometheus" /usr/local/bin/
-    sudo cp -vf "$folder_name/promtool" /usr/local/bin/
+  # Binaries
+  sudo cp -vf "$folder_name/prometheus" /usr/local/bin/
+  sudo cp -vf "$folder_name/promtool" /usr/local/bin/
 
-    # Configurations
-    if [ ! -d "/etc/prometheus" ]; then
-        sudo mkdir /etc/prometheus
-        sudo cp "$folder_name/prometheus.yml" /etc/prometheus/
-        sudo cp -r "$folder_name/consoles" /etc/prometheus/
-        sudo cp -r "$folder_name/console_libraries" /etc/prometheus/
-    fi
+  # Configurations
+  if [[ ! -d "/etc/prometheus" ]]; then
+    sudo mkdir /etc/prometheus
+    sudo cp "$folder_name/prometheus.yml" /etc/prometheus/
+    sudo cp -r "$folder_name/consoles" /etc/prometheus/
+    sudo cp -r "$folder_name/console_libraries" /etc/prometheus/
+  fi
 
-    # Data
-    if [ ! -d "/var/lib/prometheus" ]; then
-        sudo mkdir /var/lib/prometheus
-        sudo chown prometheus:prometheus /var/lib/prometheus
-    fi
+  # Data
+  if [[ ! -d "/var/lib/prometheus" ]]; then
+    sudo mkdir /var/lib/prometheus
+    sudo chown prometheus:prometheus /var/lib/prometheus
+  fi
 
-    # Cleanup
-    rm -rf "$file_name" "$folder_name"
+  # Cleanup
+  rm -rf "$file_name" "$folder_name"
 popd
 
 # Creates /etc/default config

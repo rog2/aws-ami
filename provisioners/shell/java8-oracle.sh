@@ -1,4 +1,6 @@
-#!/bin/bash -ex
+#!/bin/bash
+
+set -ex
 
 # Add the PPA repository
 sudo add-apt-repository -y ppa:webupd8team/java
