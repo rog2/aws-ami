@@ -1,7 +1,9 @@
-#!/bin/bash -e
+#!/bin/bash
 
-AMAZON_NTP_IP=169.254.169.123
-CONF_FILE=/etc/chrony/chrony.conf
+set -e
+
+readonly AMAZON_NTP_IP=169.254.169.123
+readonly CONF_FILE=/etc/chrony/chrony.conf
 
 echo "Install Amazon Time Sync Service..."
 # http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/set-time.html

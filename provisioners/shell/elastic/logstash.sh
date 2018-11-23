@@ -1,9 +1,11 @@
-#!/bin/bash -x
+#!/bin/bash
+
+set -x
 
 sudo systemctl status logstash
-if [ $? -eq 0 ]; then
-    echo "logstash is already installed. Skip reinstalling it."
-    exit 0
+if [[ $? -eq 0 ]]; then
+  echo "logstash is already installed. Skip reinstalling it."
+  exit 0
 fi
 
 echo "Installing logstash"
@@ -22,4 +24,3 @@ sudo systemctl disable logstash
 #sudo systemctl enable logstash
 
 sudo systemctl status logstash
-exit $?

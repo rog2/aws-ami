@@ -1,4 +1,6 @@
-#!/bin/bash -ex
+#!/bin/bash
+
+set -ex
 
 # echo 'Configuring journal storage...'
 # Create /var/log/journal folder to make journal data can saved in. Please refer to journald.conf(5)

@@ -8,8 +8,8 @@
 # echo "Persistent=false" | sudo tee "$conf_file" -a
 # echo "OnBootSec=1h" | sudo tee "$conf_file" -a
 
-APT_PERIODIC_CONF_PATH=/etc/apt/apt.conf.d
-APT_PERIODIC_CONF_FILE=$APT_PERIODIC_CONF_PATH/99-seasungames-disable-periodic
+readonly APT_PERIODIC_CONF_PATH=/etc/apt/apt.conf.d
+readonly APT_PERIODIC_CONF_FILE=${APT_PERIODIC_CONF_PATH}/99-seasungames-disable-periodic
 
 # Disable apt-daily and apt-daily-upgrade service
 sudo systemctl disable apt-daily.timer
