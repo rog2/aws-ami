@@ -9,7 +9,8 @@
     "timezone": "Asia/Shanghai",
     "java_version": "11.0.1",
     "node_exporter_version": "0.16.0",
-    "consul_version": "1.4.0"
+    "consul_version": "1.4.0",
+    "nomad_version": "0.8.6"
   },
   "builders": [{
     "type": "amazon-ebs",
@@ -32,7 +33,8 @@
       "Prometheus Node Exporter Version": "{{user `node_exporter_version`}}",
       "Salt Version": "2018.3",
       "Filebeat Version": "6.x",
-      "Consul Version": "{{user `consul_version`}}"
+      "Consul Version": "{{user `consul_version`}}",
+      "Nomad Version": "{{user `nomad_version`}}"
     }
   }],
   "provisioners": [
@@ -91,6 +93,19 @@
     ]
   },
   {
+    "type": "file",
+    "source": "provisioners/shell/nomad",
+    "destination": "/tmp/"
+  },
+  {
+    "type": "shell",
+    "inline": [
+      "cd /tmp/nomad",
+      "chmod +x install-nomad",
+      "./install-nomad --version {{user `nomad_version`}}"
+    ]
+  },
+  {
     "type": "shell",
     "inline": [
       "echo 'Validating provisioners...'",
@@ -100,6 +115,7 @@
       "filebeat version",
       "prometheus-node-exporter --version",
       "consul --version",
+      "nomad --version",
       "echo 'Remove ssh key to make the AMI more secure.'",
       "rm -vf ~/.ssh/authorized_keys"
     ]
