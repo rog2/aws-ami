@@ -1,0 +1,47 @@
+{
+    "description": "Nginx",
+    "variables": {
+      "region": null,
+      "subnet_id": null,
+      "source_ami": null,
+      "ami_name": "ubuntu/18.04/nginx/{{isotime \"20060102\"}}",
+      "iam_instance_profile": "packer-ec2"
+    },
+    "builders": [{
+      "type": "amazon-ebs",
+      "region": "{{user `region`}}",
+      "source_ami": "{{user `source_ami`}}",
+      "ami_name": "{{user `ami_name`}}",
+      "ami_description": "nginx",
+      "instance_type": "t2.micro",
+      "iam_instance_profile": "{{user `iam_instance_profile`}}",
+      "ssh_username": "ubuntu",
+      "associate_public_ip_address": true,
+      "subnet_id": "{{user `subnet_id`}}",
+      "tags": {
+        "Name": "{{user `ami_name`}}",
+        "Base AMI": "{{user `source_ami`}}",
+        "OS": "Ubuntu Server",
+        "OS Version": "18.04"
+      }
+    }],
+    "provisioners": [{
+      "type": "shell",
+      "inline": [
+        "echo 'Wait 30 seconds for the OS to initialize...'",
+        "sleep 30"
+      ]
+    }, {
+      "type": "shell",
+      "script": "provisioners/shell/nginx.sh",
+      "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo {{ .Path }}"
+    }, {
+      "type": "shell",
+      "inline": [
+        "echo 'Remove ssh key to make the AMI more secure.'",
+        "rm -vf ~/.ssh/authorized_keys"
+      ]
+    }]
+  }
+  
+    

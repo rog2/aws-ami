@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -ex
+sudo apt update
 
 sudo apt -y install openjdk-8-jdk
 sudo apt -y install icedtea-8-plugin
