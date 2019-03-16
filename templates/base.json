@@ -9,8 +9,8 @@
     "timezone": "Asia/Shanghai",
     "java_version": "11.0.1",
     "node_exporter_version": "0.16.0",
-    "consul_version": "1.4.0",
-    "nomad_version": "0.8.6"
+    "consul_version": "1.4.3",
+    "nomad_version": "0.8.7"
   },
   "builders": [{
     "type": "amazon-ebs",
