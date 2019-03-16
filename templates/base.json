@@ -67,7 +67,7 @@
   {
     "type": "shell",
     "environment_vars": [ "JAVA_VERSION={{user `java_version`}}" ],
-    "script": "provisioners/shell/java11-openjdk.sh"
+    "script": "provisioners/shell/java-11-openjdk.sh"
   },
   {
     "type": "shell",
