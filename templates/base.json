@@ -7,7 +7,7 @@
     "ami_name": "ubuntu/18.04/base/{{isotime \"20060102\"}}",
     "iam_instance_profile": "packer-ec2",
     "timezone": "Asia/Shanghai",
-    "java_version": "11.0.1",
+    "java_version": "11.0.2.9-3",
     "node_exporter_version": "0.16.0",
     "consul_version": "1.4.3",
     "nomad_version": "0.8.7"
@@ -29,6 +29,7 @@
       "OS": "Ubuntu Server",
       "OS Version": "18.04",
       "Timezone": "{{user `timezone`}}",
+      "Java Distribution": "Amazon Corretto",
       "Java Version": "{{user `java_version`}}",
       "Prometheus Node Exporter Version": "{{user `node_exporter_version`}}",
       "Salt Version": "2018.3",
@@ -46,7 +47,18 @@
     ]
   },
   {
+    "type": "file",
+    "source": "provisioners/shell/bash-helpers.sh",
+    "destination": "/tmp/"
+  },
+  {
     "type": "shell",
+    "environment_vars": [
+      "BASH_HELPERS=/tmp/bash-helpers.sh",
+      "TIMEZONE={{user `timezone`}}",
+      "JAVA_VERSION={{user `java_version`}}",
+      "NODE_EXPORTER_VERSION={{user `node_exporter_version`}}"
+    ],
     "scripts": [
       "provisioners/shell/apt-upgrade.sh",
       "provisioners/shell/packages.sh",
@@ -59,25 +71,13 @@
       "provisioners/shell/salt/salt-minion.sh",
       "provisioners/shell/core-pattern.sh",
       "provisioners/shell/chrony.sh",
+      "provisioners/shell/timezone.sh",
       "provisioners/shell/cfn-helper-scripts.sh",
       "provisioners/shell/elastic/apt-init.sh",
-      "provisioners/shell/elastic/filebeat.sh"
+      "provisioners/shell/elastic/filebeat.sh",
+      "provisioners/shell/java-11-amazon-corretto.sh",
+      "provisioners/shell/prometheus/node-exporter.sh"
     ]
-  },
-  {
-    "type": "shell",
-    "environment_vars": [ "JAVA_VERSION={{user `java_version`}}" ],
-    "script": "provisioners/shell/java-11-openjdk.sh"
-  },
-  {
-    "type": "shell",
-    "environment_vars": [ "TIMEZONE={{user `timezone`}}" ],
-    "script": "provisioners/shell/timezone.sh"
-  },
-  {
-    "type": "shell",
-    "environment_vars": [ "NODE_EXPORTER_VERSION={{user `node_exporter_version`}}" ],
-    "script": "provisioners/shell/prometheus/node-exporter.sh"
   },
   {
     "type": "file",
