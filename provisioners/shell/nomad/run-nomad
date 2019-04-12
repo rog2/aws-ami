@@ -201,6 +201,8 @@ After=network-online.target
 # We run Consul on every Nomad node.
 Wants=consul.service
 After=consul.service
+StartLimitBurst=3
+StartLimitIntervalSec=10
 
 [Service]
 User=$username
@@ -211,8 +213,6 @@ ExecStart=$nomad_binary_path agent -config=$config_dir
 ExecReload=/bin/kill -HUP \$MAINPID
 Restart=on-failure
 RestartSec=2
-StartLimitBurst=3
-StartLimitIntervalSec=10
 LimitNOFILE=65536
 
 [Install]
