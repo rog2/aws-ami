@@ -150,6 +150,16 @@ EOF
     client_config=$(cat <<EOF
 client {
   enabled = true
+  chroot_env {
+    "/bin"                  = "/bin"
+    "/etc"                  = "/etc"
+    "/lib"                  = "/lib"
+    "/lib64"                = "/lib64"
+    "/sbin"                 = "/sbin"
+    "/usr"                  = "/usr"
+    "/run/resolvconf"       = "/run/resolvconf"
+    "/run/systemd/resolve"  = "/run/systemd/resolve"
+  }
   meta {
     "availability" = "$meta_availability"
   }
