@@ -10,6 +10,7 @@
     "timezone": "Asia/Shanghai",
     "java_version": "11.0.3.7-1",
     "node_exporter_version": "0.17.0",
+    "docker_version": "18.09.5",
     "consul_version": "1.4.4",
     "nomad_version": "0.9.0"
   },
@@ -35,6 +36,7 @@
       "Prometheus Node Exporter Version": "{{user `node_exporter_version`}}",
       "Salt Version": "2018.3",
       "Filebeat Version": "6.x",
+      "Docker Version": "{{user `docker_version`}}",
       "Consul Version": "{{user `consul_version`}}",
       "Nomad Version": "{{user `nomad_version`}}"
     }
@@ -58,7 +60,8 @@
       "BASH_HELPERS=/tmp/bash-helpers.sh",
       "TIMEZONE={{user `timezone`}}",
       "JAVA_VERSION={{user `java_version`}}",
-      "NODE_EXPORTER_VERSION={{user `node_exporter_version`}}"
+      "NODE_EXPORTER_VERSION={{user `node_exporter_version`}}",
+      "DOCKER_VERSION={{user `docker_version`}}"
     ],
     "scripts": [
       "provisioners/shell/apt-mirrors.sh",
@@ -76,7 +79,8 @@
       "provisioners/shell/elastic/apt-init.sh",
       "provisioners/shell/elastic/filebeat.sh",
       "provisioners/shell/java-11-amazon-corretto.sh",
-      "provisioners/shell/prometheus/node-exporter.sh"
+      "provisioners/shell/prometheus/node-exporter.sh",
+      "provisioners/shell/docker.sh"
     ]
   },
   {
@@ -114,6 +118,7 @@
       "salt-minion --version",
       "filebeat version",
       "prometheus-node-exporter --version",
+      "docker --version",
       "consul --version",
       "nomad --version",
       "echo 'Remove ssh key to make the AMI more secure.'",
