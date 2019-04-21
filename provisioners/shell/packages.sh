@@ -36,4 +36,4 @@ done
 sudo snap remove amazon-ssm-agent
 
 # Uninstall snapd, which is not used by us.
-sudo apt-get purge snapd
+sudo apt-get purge -y snapd
