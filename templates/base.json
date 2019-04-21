@@ -61,6 +61,7 @@
       "NODE_EXPORTER_VERSION={{user `node_exporter_version`}}"
     ],
     "scripts": [
+      "provisioners/shell/apt-mirrors.sh",
       "provisioners/shell/apt-upgrade.sh",
       "provisioners/shell/packages.sh",
       "provisioners/shell/pip-source.sh",
