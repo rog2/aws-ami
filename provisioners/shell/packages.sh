@@ -31,3 +31,9 @@ for dep in $DEPS; do
     set +x
   fi
 done
+
+# Uninstall amazon-ssm-agent, which comes with Ubuntu 18.04 AMI via snap.
+sudo snap remove amazon-ssm-agent
+
+# Uninstall snapd, which is not used by us.
+sudo apt-get purge snapd
