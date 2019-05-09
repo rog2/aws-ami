@@ -42,7 +42,7 @@
       "environment_vars": [
         "BASH_HELPERS=/tmp/bash-helpers.sh"
       ],
-      "script": "provisioners/shell/opendistro-for-elasticsearch/opendistroforelasticsearch.sh"
+      "script": "provisioners/shell/opendistro-for-elasticsearch/opendistro-for-elasticsearch.sh"
     },
     {
       "type": "shell",
