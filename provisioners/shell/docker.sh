@@ -28,7 +28,7 @@ log_info "Installing docker-ce=$docker_version"
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q docker-ce=$docker_version
 
 log_info 'Pin docker-ce to current version'
-sudo apt-mark hold docker-ce
+sudo apt-mark hold docker-ce docker-ce-cli
 
 log_info 'Add current user to docker group'
 sudo gpasswd -a $USER docker
