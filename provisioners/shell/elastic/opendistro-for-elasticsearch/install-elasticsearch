@@ -3,7 +3,7 @@ set -x
 
 source "$BASH_HELPERS"
 readonly INSTALL_PATH="/opt/elasticsearch"
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly SCRIPT_DIR="/tmp"
 
 function create_install_paths_and_binary() {
   local readonly run_path="$INSTALL_PATH/run-elasticsearch"
