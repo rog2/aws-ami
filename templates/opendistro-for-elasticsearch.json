@@ -38,6 +38,11 @@
         "destination": "/tmp/"
     },
     {
+      "type": "file",
+      "source": "provisioners/shell/elastic/opendistro-for-elasticsearch/run-elasticsearch",
+      "destination": "/tmp/"
+    },
+    {
       "type": "shell",
       "environment_vars": [
         "BASH_HELPERS=/tmp/bash-helpers.sh"
