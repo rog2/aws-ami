@@ -6,7 +6,7 @@
       "source_ami": null,
       "ami_name": "ubuntu/18.04/opendistro-for-elasticsearch/{{isotime \"20060102\"}}",
       "iam_instance_profile": "packer-ec2",
-      "opendistro_for_elasticsearch_version": "0.9.0",
+      "opendistro_for_elasticsearch_version": "0.9.0-1",
       "elasticsearch_oss_version": "6.7.1"
     },
     "builders": [{
