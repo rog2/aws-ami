@@ -18,7 +18,7 @@ function generate_elasticsearch_consul_config() {
       "check": {
           "name": "Elasticsearch HTTP health",
           "http": "https://localhost:9200/_opendistro/_security/health",
-          "tls_skip_verify" = true,
+          "tls_skip_verify": true,
           "interval": "10s",
           "timeout": "1s"
       }
@@ -33,6 +33,7 @@ EOF
 function generate_elasticsearch_config() {
   local readonly config_path="/etc/elasticsearch/jvm.options"
   echo "Installing config file in $config_path"
+  # set 50% memory to elasticsearch
   local memory=$(vmstat -s | awk '{print $1 / 1024 / 1024/ 2}' | head -1 | awk '{printf("%0.f\n",$0)}')
   sudo sed -i 's/\(-Xms\).*/\1'"$memory"g'/g' $config_path
   sudo sed -i 's/\(-Xmx\).*/\1'"$memory"g'/g' $config_path

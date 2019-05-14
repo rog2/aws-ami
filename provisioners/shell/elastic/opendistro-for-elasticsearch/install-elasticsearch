@@ -2,6 +2,9 @@
 set -x
 
 source "$BASH_HELPERS"
+
+assert_not_empty "OPEN_DISTRO_FOR_ELASTICSEARCH_VERSION" "$OPEN_DISTRO_FOR_ELASTICSEARCH_VERSION"
+
 readonly INSTALL_PATH="/opt/elasticsearch"
 readonly SCRIPT_DIR="/tmp"
 
@@ -25,8 +28,10 @@ function install() {
   sudo dpkg -i "$download_path"
   sudo apt-get update -y
 
-  echo "Installing opendistroforelasticsearch"
-  sudo apt-get install -y opendistroforelasticsearch
+  echo "Installing opendistroforelasticsearch version $OPEN_DISTRO_FOR_ELASTICSEARCH_VERSION"
+  sudo apt-get install -y opendistroforelasticsearch=$OPEN_DISTRO_FOR_ELASTICSEARCH_VERSION
+
+  sudo gpasswd -a $USER elasticsearch
 }
 
 install

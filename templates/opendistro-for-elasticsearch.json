@@ -14,7 +14,7 @@
       "region": "{{user `region`}}",
       "source_ami": "{{user `source_ami`}}",
       "ami_name": "{{user `ami_name`}}",
-      "ami_description": "opendistroforelasticsearch 0.9.0 with kibana.",
+      "ami_description": "Open Distro for Elasticsearch On base ami",
       "instance_type": "t2.medium",
       "iam_instance_profile": "{{user `iam_instance_profile`}}",
       "ssh_username": "ubuntu",
@@ -49,7 +49,8 @@
     {
       "type": "shell",
       "environment_vars": [
-        "BASH_HELPERS=/tmp/bash-helpers.sh"
+        "BASH_HELPERS=/tmp/bash-helpers.sh",
+        "OPEN_DISTRO_FOR_ELASTICSEARCH_VERSION={{user `opendistro_for_elasticsearch_version`}}"
       ],
       "script": "provisioners/shell/elastic/opendistro-for-elasticsearch/install-elasticsearch"
     },
