@@ -15,9 +15,9 @@ function generate_elasticsearch_consul_config() {
       "name": "elasticsearch",
       "port": 9200,
       "check": {
-          "id": "elasticsearch-health",
-          "name": "HTTP health",
-          "http": "http://localhost:9200",
+          "name": "Elasticsearch HTTP health",
+          "http": "https://localhost:9200/_opendistro/_security/health",
+          "tls_skip_verify" = true,
           "interval": "10s",
           "timeout": "1s"
       }
@@ -52,8 +52,7 @@ function run() {
   generate_elasticsearch_config
   sudo systemctl enable elasticsearch.service
   sudo systemctl start elasticsearch.service
-  sudo systemctl restart consul.service
-
+  
   run_salt
 }
 
