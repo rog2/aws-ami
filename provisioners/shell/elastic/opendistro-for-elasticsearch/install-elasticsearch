@@ -29,11 +29,6 @@ function install() {
   sudo apt-get install -y opendistroforelasticsearch
   sudo systemctl start elasticsearch.service
   sudo systemctl status elasticsearch.service
-
-  echo "Installing kibana"
-  sudo apt-get install -y opendistroforelasticsearch-kibana
-  sudo systemctl start kibana.service
-  sudo systemctl status kibana.service
 }
 
 install

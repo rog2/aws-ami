@@ -5,7 +5,9 @@
       "subnet_id": null,
       "source_ami": null,
       "ami_name": "ubuntu/18.04/opendistro-for-elasticsearch/{{isotime \"20060102\"}}",
-      "iam_instance_profile": "packer-ec2"
+      "iam_instance_profile": "packer-ec2",
+      "opendistro_for_elasticsearch_version": "0.9.0",
+      "elasticsearch_oss_version": "6.7.1"
     },
     "builders": [{
       "type": "amazon-ebs",
@@ -22,7 +24,9 @@
         "Name": "{{user `ami_name`}}",
         "Base AMI": "{{user `source_ami`}}",
         "OS": "Ubuntu Server",
-        "OS Version": "18.04"
+        "OS Version": "18.04",
+        "Open Distro for Elasticsearch Version": "{{user `opendistro_for_elasticsearch_version`}}",
+        "Elasticsearch oss Version": "{{user `elasticsearch_oss_version`}}"
       }
     }],
     "provisioners": [{

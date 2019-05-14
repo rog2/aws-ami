@@ -3,22 +3,8 @@
 
 readonly INSTALL_PATH="/opt/elasticsearch"
 readonly CONSUL_CONFIG_DIR="/opt/consul/config"
-
-function print_usage() {
-  echo
-  echo "Usage: install-consul [OPTIONS]"
-  echo
-  echo "This script can be used to run open-distro-for-elasticsearch"
-  echo
-  echo "Options:"
-  echo
-  echo -e "  --kibana\t\t        If set, run kibana. Optional. Exactly one of --kibana or --elasticsearch must be set."
-  echo -e "  --elasticsearch\t\tIf set, run elasticsearch. Optional. Exactly one of --kibana or --elasticsearch must be set."
-  echo
-  echo "Example:"
-  echo
-  echo "  run-elasticsearch --elasticsearch"
-}
+readonly ES_FILE="/etc/elasticsearch/elasticsearch.yml"
+readonly ES_DEFAULT_CONFIG="/etc/default/elasticsearch"
 
 function generate_elasticsearch_consul_config() {
   local readonly config_path="$CONSUL_CONFIG_DIR/elasticsearch.json"
@@ -43,110 +29,32 @@ EOF
   echo "$default_config_json" | jq '.' >"$config_path"
 }
 
-function generate_kibana_consul_config() {
-  local readonly config_path="$CONSUL_CONFIG_DIR/kibana.json"
-  local default_config_json=$(
-    cat <<EOF
-{
-  "service": {
-      "name": "kibana",
-      "port": 5601,
-      "check": {
-          "id": "elasticsearch-health",
-          "name": "HTTP health",
-          "http": "http://localhost:5601",
-          "interval": "10s",
-          "timeout": "1s"
-      }
-  }
-}
-EOF
-  )
-  echo "Installing Consul config file in $config_path"
-  echo "$default_config_json" | jq '.' >"$config_path"
-}
-
-function generate_kibana_config() {
-  local readonly config_path="/etc/kibana/kibana.yml"
-  echo "Installing config file in $config_path"
-  sudo sed -i  's#\(elasticsearch.url:\).*#\1 'https://elasticsearch.service.consul:9200'#g' $config_path
-  sudo echo 'server.host: 0.0.0.0' >> $config_path
-}
-
 function generate_elasticsearch_config() {
   local readonly config_path="/etc/elasticsearch/jvm.options"
   echo "Installing config file in $config_path"
-  local memory=$(vmstat -s | awk '{print $1 / 1024 / 1024/ 2}' | head -1| awk '{printf("%0.f\n",$0)}')
-  sudo sed -i  's/\(-Xms\).*/\1'"$memory"g'/g' $config_path
-  sudo sed -i  's/\(-Xmx\).*/\1'"$memory"g'/g' $config_path
+  local memory=$(vmstat -s | awk '{print $1 / 1024 / 1024/ 2}' | head -1 | awk '{printf("%0.f\n",$0)}')
+  sudo sed -i 's/\(-Xms\).*/\1'"$memory"g'/g' $config_path
+  sudo sed -i 's/\(-Xmx\).*/\1'"$memory"g'/g' $config_path
+  echo "Installing config file in $ES_FILE"
+  echo 'network.host: 0.0.0.0' >> $ES_FILE
+  echo "Installing config file in $ES_DEFAULT_CONFIG"
+  echo 'JAVA_HOME=/usr/lib/jvm/java-11-amazon-corretto' >> $ES_DEFAULT_CONFIG
 }
 
 function run_salt() {
-  local readonly kibana="${1}"
-  local readonly elasticsearch="${2}"
-  if [[ "$kibana" == "true" ]]; then
-    salt-call grains.append roles kibana --local
-  fi
-  if [[ "$elasticsearch" == "true" ]]; then
-    salt-call grains.append roles elasticsearch --local
-  fi
-  
+  salt-call grains.append roles elasticsearch --local
   sudo systemctl enable salt-minion.service
   sudo systemctl start salt-minion.service
 }
 
 function run() {
-  local kibana="false"
-  local elasticsearch="false"
+  generate_elasticsearch_consul_config
+  generate_elasticsearch_config
+  sudo systemctl enable elasticsearch.service
+  sudo systemctl start elasticsearch.service
+  sudo systemctl restart consul.service
 
-  while [[ $# > 0 ]]; do
-    local key="$1"
-
-    case "$key" in
-    --elasticsearch)
-      elasticsearch="true"
-      ;;
-    --kibana)
-      kibana="true"
-      ;;
-    --help)
-      print_usage
-      exit
-      ;;
-    *)
-      echo "Unrecognized argument: $key"
-      print_usage
-      exit 1
-      ;;
-    esac
-
-    shift
-  done
-
-  if [[ "$kibana" == "false" || "$elasticsearch" == "false" ]]; then
-    print_usage
-    exit 1
-  fi
-  
-  if [[ "$kibana" == "true" ]]; then
-    generate_kibana_consul_config
-    generate_kibana_config
-    sudo systemctl enable kibana.service
-    sudo systemctl start kibana.service
-    sudo systemctl restart consul.service 
-  fi
-
-  if [[ "$elasticsearch" == "true" ]]; then
-    generate_elasticsearch_consul_config
-    generate_elasticsearch_config
-    sudo systemctl enable elasticsearch.service
-    sudo systemctl start elasticsearch.service
-    sudo systemctl restart consul.service 
-  fi
-
-  if [[ "$server" == "true" || "$client" == "true" ]]; then
-    run_salt kibana elasticsearch
-  fi
+  run_salt
 }
 
-run "$@"
+run
