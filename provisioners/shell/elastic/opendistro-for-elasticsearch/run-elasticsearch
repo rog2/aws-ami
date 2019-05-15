@@ -6,7 +6,7 @@ readonly CONSUL_CONFIG_DIR="/opt/consul/config"
 readonly ES_FILE="/etc/elasticsearch/elasticsearch.yml"
 readonly ES_DEFAULT_CONFIG="/etc/default/elasticsearch"
 readonly ES_USER_CONFIG="/usr/share/elasticsearch/plugins/opendistro_security/securityconfig/internal_users.yml"
- 
+
 function generate_elasticsearch_consul_config() {
   local readonly config_path="$CONSUL_CONFIG_DIR/elasticsearch.json"
   local default_config_json=$(
@@ -46,6 +46,11 @@ function generate_elasticsearch_config() {
   sudo sed -i '/readonly/d' $ES_USER_CONFIG
 }
 
+function run_elasticsearch() {
+  sudo systemctl enable elasticsearch.service
+  sudo systemctl start elasticsearch.service
+}
+
 function run_salt() {
   salt-call grains.append roles elasticsearch --local
   sudo systemctl enable salt-minion.service
@@ -55,9 +60,8 @@ function run_salt() {
 function run() {
   generate_elasticsearch_consul_config
   generate_elasticsearch_config
-  sudo systemctl enable elasticsearch.service
-  sudo systemctl start elasticsearch.service
 
+  run_elasticsearch
   run_salt
 }
 

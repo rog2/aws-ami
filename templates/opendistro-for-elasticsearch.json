@@ -6,7 +6,7 @@
       "source_ami": null,
       "ami_name": "ubuntu/18.04/opendistro-for-elasticsearch/{{isotime \"20060102\"}}",
       "iam_instance_profile": "packer-ec2",
-      "opendistro_for_elasticsearch_version": "0.9.0-1",
+      "odfe_version": "0.9.0-1",
       "elasticsearch_oss_version": "6.7.1"
     },
     "builders": [{
@@ -25,8 +25,8 @@
         "Base AMI": "{{user `source_ami`}}",
         "OS": "Ubuntu Server",
         "OS Version": "18.04",
-        "Open Distro for Elasticsearch Version": "{{user `opendistro_for_elasticsearch_version`}}",
-        "Elasticsearch oss Version": "{{user `elasticsearch_oss_version`}}"
+        "Open Distro for Elasticsearch Version": "{{user `odfe_version`}}",
+        "Elasticsearch OSS Version": "{{user `elasticsearch_oss_version`}}"
       }
     }],
     "provisioners": [{
@@ -50,7 +50,8 @@
       "type": "shell",
       "environment_vars": [
         "BASH_HELPERS=/tmp/bash-helpers.sh",
-        "OPEN_DISTRO_FOR_ELASTICSEARCH_VERSION={{user `opendistro_for_elasticsearch_version`}}"
+        "ODFE_VERSION={{user `odfe_version`}}",
+        "ELASTICSEARCH_OSS_VERSION={{user `elasticsearch_oss_version`}}"
       ],
       "script": "provisioners/shell/elastic/opendistro-for-elasticsearch/install-elasticsearch"
     },
