@@ -1,0 +1,68 @@
+#!/bin/bash
+# set -x
+
+readonly INSTALL_PATH="/opt/elasticsearch"
+readonly CONSUL_CONFIG_DIR="/opt/consul/config"
+readonly ES_FILE="/etc/elasticsearch/elasticsearch.yml"
+readonly ES_DEFAULT_CONFIG="/etc/default/elasticsearch"
+readonly ES_USER_CONFIG="/usr/share/elasticsearch/plugins/opendistro_security/securityconfig/internal_users.yml"
+
+function generate_elasticsearch_consul_config() {
+  local readonly config_path="$CONSUL_CONFIG_DIR/elasticsearch.json"
+  local default_config_json=$(
+    cat <<EOF
+{
+  "service": {
+      "name": "elasticsearch",
+      "port": 9200,
+      "check": {
+          "name": "Elasticsearch HTTP health",
+          "http": "https://localhost:9200/_opendistro/_security/health",
+          "tls_skip_verify": true,
+          "interval": "10s",
+          "timeout": "1s"
+      }
+  }
+}
+EOF
+  )
+  echo "Installing Consul config file in $CONSUL_CONFIG_DIR"
+  echo "$default_config_json" | jq '.' >"$config_path"
+}
+
+function generate_elasticsearch_config() {
+  local readonly config_path="/etc/elasticsearch/jvm.options"
+  echo "Installing config file in $config_path"
+  # set 50% memory to elasticsearch
+  local memory=$(vmstat -s | awk '{print $1 / 1024 / 1024/ 2}' | head -1 | awk '{printf("%0.f\n",$0)}')
+  sudo sed -i 's/\(-Xms\).*/\1'"$memory"g'/g' $config_path
+  sudo sed -i 's/\(-Xmx\).*/\1'"$memory"g'/g' $config_path
+  echo "Installing config file in $ES_FILE"
+  echo 'network.host: 0.0.0.0' >>$ES_FILE
+  echo "Installing config file in $ES_DEFAULT_CONFIG"
+  echo 'JAVA_HOME=/usr/lib/jvm/java-11-amazon-corretto' >>$ES_DEFAULT_CONFIG
+
+  echo "Modify $ES_USER_CONFIG"
+  sudo sed -i '/readonly/d' $ES_USER_CONFIG
+}
+
+function run_elasticsearch() {
+  sudo systemctl enable elasticsearch.service
+  sudo systemctl start elasticsearch.service
+}
+
+function run_salt() {
+  salt-call grains.append roles elasticsearch --local
+  sudo systemctl enable salt-minion.service
+  sudo systemctl start salt-minion.service
+}
+
+function run() {
+  generate_elasticsearch_consul_config
+  generate_elasticsearch_config
+
+  run_elasticsearch
+  run_salt
+}
+
+run
