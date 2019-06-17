@@ -9,7 +9,7 @@ if [[ $? -eq 0 ]]; then
 fi
 
 echo "Installing filebeat"
-sudo apt-get install -y filebeat
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q filebeat
 
 sudo systemctl start filebeat
 sudo systemctl enable filebeat

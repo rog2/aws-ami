@@ -9,7 +9,7 @@ if [[ $? -eq 0 ]]; then
 fi
 
 echo "Installing elasticsearch"
-sudo apt-get install -y elasticsearch
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q elasticsearch
 
 #sudo /usr/share/elasticsearch/bin/elasticsearch-plugin install x-pack
 

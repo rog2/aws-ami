@@ -2,7 +2,7 @@
 
 set -e
 
-sudo apt-get -y install python-setuptools
+sudo DEBIAN_FRONTEND=noninteractive apt-get -y -q install python-setuptools
 
 az=$(ec2metadata --availability-zone)
 

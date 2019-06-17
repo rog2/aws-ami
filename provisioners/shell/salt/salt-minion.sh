@@ -6,7 +6,7 @@ set -e
 
 # Depends on salt-repo has been configurated.
 
-sudo apt-get update && sudo apt-get install salt-minion -y
+sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install salt-minion -y -q
 
 # disable salt-minion by default
 sudo systemctl disable salt-minion.service

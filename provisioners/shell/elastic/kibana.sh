@@ -9,7 +9,7 @@ if [[ $? -eq 0 ]]; then
 fi
 
 echo "Installing kibana"
-sudo apt-get install -y kibana
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q kibana
 
 #sudo /usr/share/kibana/bin/kibana-plugin install x-pack
 

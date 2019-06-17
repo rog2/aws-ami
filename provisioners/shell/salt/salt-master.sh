@@ -6,7 +6,7 @@ set -e
 
 # Depends on salt-repo has been configurated.
 
-sudo apt-get update && sudo apt-get install salt-master salt-api salt-cloud -y
+sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install salt-master salt-api salt-cloud -y -q
 
 echo 'Disable salt-master & salt-api...'
 sudo systemctl disable salt-master.service

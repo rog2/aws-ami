@@ -9,7 +9,7 @@ if [[ $? -eq 0 ]]; then
 fi
 
 echo "Installing logstash"
-sudo apt-get install -y logstash
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q logstash
 
 echo "add logstash-output-amazon_es plugin"
 sudo /usr/share/logstash/bin/logstash-plugin install logstash-output-amazon_es

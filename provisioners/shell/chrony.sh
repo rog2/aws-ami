@@ -7,7 +7,7 @@ readonly CONF_FILE=/etc/chrony/chrony.conf
 
 echo "Install Amazon Time Sync Service..."
 # http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/set-time.html
-sudo apt-get install -y chrony
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q chrony
 
 echo "Configuring Amazon Time Sync Service..."
 

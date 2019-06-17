@@ -2,7 +2,7 @@
 
 set -ex
 
-sudo apt-get -y install python3-pip
+sudo DEBIAN_FRONTEND=noninteractive apt-get -y -q install python3-pip
 
 # Install AWS CLI using pip3
 # To upgrade an existing AWS CLI installation, use the --upgrade option: sudo pip3 install --upgrade awscli

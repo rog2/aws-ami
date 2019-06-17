@@ -33,7 +33,7 @@ function install() {
   readonly odfe_version=$(apt-cache madison opendistroforelasticsearch | grep $ODFE_VERSION | head -1 | awk '{print $3}')
 
   echo "Installing opendistroforelasticsearch version $odfe_version"
-  sudo apt-get install -y opendistroforelasticsearch=$odfe_version
+  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q opendistroforelasticsearch=$odfe_version
 
   sudo gpasswd -a $USER elasticsearch
 }
