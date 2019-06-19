@@ -186,6 +186,14 @@ consul {
   address = "127.0.0.1:8500"
 }
 
+acl {
+  enabled = true
+}
+
+telemetry {
+  prometheus_metrics = true
+}
+
 $client_config
 $server_config
 EOF
