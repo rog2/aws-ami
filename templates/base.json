@@ -9,7 +9,7 @@
     "iam_instance_profile": "packer-ec2",
     "timezone": "Asia/Shanghai",
     "java_version": "11.0.3.7-1",
-    "node_exporter_version": "0.17.0",
+    "node_exporter_version": "0.18.1",
     "docker_version": "18.09.6",
     "consul_version": "1.5.1",
     "nomad_version": "0.9.3"
