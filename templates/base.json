@@ -34,8 +34,6 @@
       "Java Distribution": "Amazon Corretto",
       "Java Version": "{{user `java_version`}}",
       "Prometheus Node Exporter Version": "{{user `node_exporter_version`}}",
-      "Salt Version": "2018.3",
-      "Filebeat Version": "6.x",
       "Docker Version": "{{user `docker_version`}}",
       "Consul Version": "{{user `consul_version`}}",
       "Nomad Version": "{{user `nomad_version`}}"
@@ -74,10 +72,6 @@
       "provisioners/shell/timezone.sh",
       "provisioners/shell/pip-source.sh",
       "provisioners/shell/awscli.sh",
-      "provisioners/shell/salt/salt-repo.sh",
-      "provisioners/shell/salt/salt-minion.sh",
-      "provisioners/shell/elastic/apt-init.sh",
-      "provisioners/shell/elastic/filebeat.sh",
       "provisioners/shell/java-11-amazon-corretto.sh",
       "provisioners/shell/prometheus/node-exporter.sh",
       "provisioners/shell/docker.sh"
@@ -115,8 +109,6 @@
       "echo 'Validating provisioners...'",
       "aws --version",
       "java -version",
-      "salt-minion --version",
-      "filebeat version",
       "prometheus-node-exporter --version",
       "docker --version",
       "consul --version",
