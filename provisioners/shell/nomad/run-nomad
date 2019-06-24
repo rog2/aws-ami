@@ -94,15 +94,6 @@ function get_instance_region {
   lookup_path_in_instance_dynamic_data "instance-identity/document" | jq -r ".region"
 }
 
-function get_instance_meta_availability {
-  local readonly public_ipv4=$(lookup_path_in_instance_metadata "public-ipv4")
-  if [[ -z "$public_ipv4" ]]; then
-    echo "private"
-  else
-    echo "public"
-  fi
-}
-
 function assert_is_installed {
   local readonly name="$1"
 
@@ -144,9 +135,6 @@ EOF
 
   local client_config=""
   if [[ "$client" == "true" ]]; then
-    # We need this meta to constraint some jobs to run on nodes with public IP addresses
-    # https://github.com/hashicorp/nomad/issues/646
-    local readonly meta_availability=$(get_instance_meta_availability)
     client_config=$(cat <<EOF
 client {
   enabled = true
@@ -159,9 +147,6 @@ client {
     "/usr"                  = "/usr"
     "/run/resolvconf"       = "/run/resolvconf"
     "/run/systemd/resolve"  = "/run/systemd/resolve"
-  }
-  meta {
-    "availability" = "$meta_availability"
   }
 }
 EOF
