@@ -29,10 +29,12 @@ function print_usage {
   echo -e "  --server\t\tIf set, run in server mode. Optional. At least one of --server or --client must be set."
   echo -e "  --client\t\tIf set, run in client mode. Optional. At least one of --server or --client must be set."
   echo -e "  --num-servers\t\tThe number of servers to expect in the Nomad cluster. Required if --server is true."
+  echo -e "  --node-class\t\tThe node_class of nomad client. Optional if --client is true."
   echo
   echo "Example:"
   echo
   echo "  run-nomad --server --num-servers 3"
+  echo "  run-nomad --client --node-class proxy"
 }
 
 function log {
@@ -107,9 +109,10 @@ function generate_nomad_config {
   local readonly server="$1"
   local readonly client="$2"
   local readonly num_servers="$3"
-  local readonly config_dir="$4"
-  local readonly data_dir="$5"
-  local readonly user="$6"
+  local readonly node_class="$4"
+  local readonly config_dir="$5"
+  local readonly data_dir="$6"
+  local readonly user="$7"
   local readonly config_path="$config_dir/$NOMAD_CONFIG_FILE"
 
   local instance_id=""
@@ -138,6 +141,7 @@ EOF
     client_config=$(cat <<EOF
 client {
   enabled = true
+  node_class = "$node_class"
   chroot_env {
     "/bin"                  = "/bin"
     "/etc"                  = "/etc"
@@ -236,6 +240,7 @@ function run {
   local server="false"
   local client="false"
   local num_servers=""
+  local node_class=""
   local user=""
 
   local readonly bin_dir="$NOMAD_INSTALL_PATH/bin"
@@ -254,6 +259,10 @@ function run {
         ;;
       --num-servers)
         num_servers="$2"
+        shift
+        ;;
+      --node-class)
+        node_class="$2"
         shift
         ;;
       --help)
@@ -291,7 +300,7 @@ function run {
   assert_is_installed "curl"
   assert_is_installed "jq"
 
-  generate_nomad_config "$server" "$client" "$num_servers" "$config_dir" "$data_dir" "$user"
+  generate_nomad_config "$server" "$client" "$num_servers" "$node_class" "$config_dir" "$data_dir" "$user"
   generate_systemd_config "$user" "$bin_dir" "$config_dir"
 
   start_nomad
