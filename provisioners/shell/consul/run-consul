@@ -198,6 +198,7 @@ function generate_consul_config {
   local instance_ip_address=""
   local instance_region=""
   local ui="false"
+  local telemetry=""
 
   instance_id=$(get_instance_id)
   instance_ip_address=$(get_instance_ip_address)
@@ -223,6 +224,13 @@ EOF
 
     bootstrap_expect="\"bootstrap_expect\": $cluster_size,"
     ui="true"
+    telemetry=$(cat <<EOF
+"telemetry": {
+  "prometheus_retention_time": "60s",
+  "disable_hostname": "true"
+  },
+EOF
+)
   fi
 
   log_info "Creating default Consul configuration"
@@ -243,6 +251,7 @@ EOF
   "node_name": "$instance_id",
   $bootstrap_expect
   $retry_join_json
+  $telemetry
   "ui": $ui
 }
 EOF
