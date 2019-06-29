@@ -5,13 +5,13 @@
     "subnet_id": null,
     "source_ami": null,
     "ami_name": "ubuntu/18.04/base/{{isotime \"20060102\"}}",
-    "instance_type": "t2.micro",
+    "instance_type": "t3.micro",
     "iam_instance_profile": "packer-ec2",
     "timezone": "Asia/Shanghai",
     "java_version": "11.0.3.7-1",
     "node_exporter_version": "0.18.1",
-    "docker_version": "18.09.6",
-    "consul_version": "1.5.1",
+    "docker_version": "18.09.7",
+    "consul_version": "1.5.2",
     "nomad_version": "0.9.3"
   },
   "builders": [{
