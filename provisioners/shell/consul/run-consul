@@ -24,6 +24,9 @@ readonly SLEEP_BETWEEN_RETRIES_SEC=10
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly SCRIPT_NAME="$(basename "$0")"
 
+# cloud-init/mount-nvme-instance-store
+readonly INSTANCE_STORE_DIR="/mnt/ephemeral"
+
 # =============================================================================
 
 function print_usage {
@@ -183,6 +186,22 @@ function get_tag_value {
   echo "$tags" | jq -r ".Tags[] | select(.Key == \"$tag_key\") | .Value"
 }
 
+# Prefer NVMe instance store (if available) as Consul data dir
+# https://learn.hashicorp.com/consul/datacenter-deploy/reference-architecture#consul-servers
+# https://www.consul.io/docs/install/performance.html
+function prepare_consul_data_dir {
+  local readonly data_dir="$1"
+  local readonly user="$2"
+  if [[ -d "$INSTANCE_STORE_DIR" ]]; then
+    local readonly instance_store_data_dir="$INSTANCE_STORE_DIR/consul"
+    log_info "Consul will write its data in NVMe instance store: $instance_store_data_dir"
+    rmdir "$data_dir"
+    mkdir -p "$instance_store_data_dir"
+    chown "$user:$user" "$instance_store_data_dir"
+    ln -s "$instance_store_data_dir" "$data_dir"
+  fi
+}
+
 function generate_consul_config {
   local readonly server="${1}"
   local readonly config_dir="${2}"
@@ -331,6 +350,8 @@ function run {
   if [[ -z "$datacenter" ]]; then
     datacenter=$(get_instance_region)
   fi
+
+  prepare_consul_data_dir "$data_dir" "$user"
 
   generate_consul_config \
     "$server" \

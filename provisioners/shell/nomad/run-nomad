@@ -16,6 +16,9 @@ readonly NOMAD_CONFIG_FILE="default.hcl"
 readonly EC2_INSTANCE_METADATA_URL="http://169.254.169.254/latest/meta-data"
 readonly EC2_INSTANCE_DYNAMIC_DATA_URL="http://169.254.169.254/latest/dynamic"
 
+# cloud-init/mount-nvme-instance-store
+readonly INSTANCE_STORE_DIR="/mnt/ephemeral"
+
 # =============================================================================
 
 function print_usage {
@@ -102,6 +105,21 @@ function assert_is_installed {
   if [[ ! $(command -v ${name}) ]]; then
     log_error "The binary '$name' is required by this script but is not installed or in the system's PATH."
     exit 1
+  fi
+}
+
+# Prefer NVMe instance store (if available) as Nomad data dir
+# https://www.nomadproject.io/guides/install/production/requirements.html
+function prepare_nomad_data_dir {
+  local readonly data_dir="$1"
+  local readonly user="$2"
+  if [[ -d "$INSTANCE_STORE_DIR" ]]; then
+    local readonly instance_store_data_dir="$INSTANCE_STORE_DIR/nomad"
+    log_info "Nomad will write its data in NVMe instance store: $instance_store_data_dir"
+    rmdir "$data_dir"
+    mkdir -p "$instance_store_data_dir"
+    chown "$user:$user" "$instance_store_data_dir"
+    ln -s "$instance_store_data_dir" "$data_dir"
   fi
 }
 
@@ -299,6 +317,8 @@ function run {
   assert_is_installed "aws"
   assert_is_installed "curl"
   assert_is_installed "jq"
+
+  prepare_nomad_data_dir "$data_dir" "$user"
 
   generate_nomad_config "$server" "$client" "$num_servers" "$node_class" "$config_dir" "$data_dir" "$user"
   generate_systemd_config "$user" "$bin_dir" "$config_dir"
