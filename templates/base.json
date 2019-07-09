@@ -79,6 +79,19 @@
   },
   {
     "type": "file",
+    "source": "provisioners/shell/cloud-init/mount-nvme-instance-store",
+    "destination": "/tmp/"
+  },
+  {
+    "type": "shell",
+    "inline": [
+      "cd /tmp/",
+      "chmod +x mount-nvme-instance-store",
+      "sudo cp -vf mount-nvme-instance-store /var/lib/cloud/scripts/per-instance/"
+    ]
+  },
+  {
+    "type": "file",
     "source": "provisioners/shell/consul",
     "destination": "/tmp/"
   },
