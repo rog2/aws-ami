@@ -7,6 +7,7 @@ sudo apt-get update
 # Common packages across all versions
 DEPS="
   apt-show-versions
+  nvme-cli
   unzip
   unrar
   htop
