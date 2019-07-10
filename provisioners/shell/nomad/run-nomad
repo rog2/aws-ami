@@ -164,12 +164,15 @@ client {
   enabled = true
   node_class = "$node_class"
   chroot_env {
-    "/bin"                  = "/bin"
     "/etc"                  = "/etc"
-    "/lib"                  = "/lib"
-    "/lib64"                = "/lib64"
+    "/bin"                  = "/bin"
     "/sbin"                 = "/sbin"
-    "/usr"                  = "/usr"
+    "/lib/x86_64-linux-gnu" = "/lib/x86_64-linux-gnu"
+    "/lib64"                = "/lib64"
+    "/usr/bin"              = "/usr/bin"
+    "/usr/lib"              = "/usr/lib"
+    "/usr/sbin"             = "/usr/sbin"
+    "/usr/local"            = "/usr/local"
     "/run/resolvconf"       = "/run/resolvconf"
     "/run/systemd/resolve"  = "/run/systemd/resolve"
   }
