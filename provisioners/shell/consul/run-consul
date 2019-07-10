@@ -190,7 +190,7 @@ function get_tag_value {
 # https://learn.hashicorp.com/consul/datacenter-deploy/reference-architecture#consul-servers
 # https://www.consul.io/docs/install/performance.html
 function prepare_consul_data_dir {
-  local readonly ebs_data_dir = "$CONSUL_INSTALL_PATH/data"
+  local readonly ebs_data_dir="$CONSUL_INSTALL_PATH/data"
   local readonly instance_store_data_dir="$INSTANCE_STORE/consul"
   local readonly user="$1"
   if [[ -d "$INSTANCE_STORE" ]]; then

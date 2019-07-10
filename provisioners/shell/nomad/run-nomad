@@ -111,7 +111,7 @@ function assert_is_installed {
 # Prefer NVMe instance store (if available) as Nomad data dir
 # https://www.nomadproject.io/guides/install/production/requirements.html
 function prepare_nomad_data_dir {
-  local readonly ebs_data_dir = "$NOMAD_INSTALL_PATH/data"
+  local readonly ebs_data_dir="$NOMAD_INSTALL_PATH/data"
   local readonly instance_store_data_dir="$INSTANCE_STORE/nomad"
   local readonly user="$1"
   if [[ -d "$INSTANCE_STORE" ]]; then
