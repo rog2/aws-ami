@@ -17,7 +17,7 @@ readonly EC2_INSTANCE_METADATA_URL="http://169.254.169.254/latest/meta-data"
 readonly EC2_INSTANCE_DYNAMIC_DATA_URL="http://169.254.169.254/latest/dynamic"
 
 # cloud-init/mount-nvme-instance-store
-readonly INSTANCE_STORE_DIR="/mnt/ephemeral"
+readonly INSTANCE_STORE="/mnt/ephemeral"
 
 # =============================================================================
 
@@ -111,15 +111,18 @@ function assert_is_installed {
 # Prefer NVMe instance store (if available) as Nomad data dir
 # https://www.nomadproject.io/guides/install/production/requirements.html
 function prepare_nomad_data_dir {
-  local readonly data_dir="$1"
-  local readonly user="$2"
-  if [[ -d "$INSTANCE_STORE_DIR" ]]; then
-    local readonly instance_store_data_dir="$INSTANCE_STORE_DIR/nomad"
-    log_info "Nomad will write its data in NVMe instance store: $instance_store_data_dir"
-    rmdir "$data_dir"
+  local readonly ebs_data_dir = "$NOMAD_INSTALL_PATH/data"
+  local readonly instance_store_data_dir="$INSTANCE_STORE/nomad"
+  local readonly user="$1"
+  if [[ -d "$INSTANCE_STORE" ]]; then
+    log_info "Nomad will use data_dir: $instance_store_data_dir"
     mkdir -p "$instance_store_data_dir"
     chown "$user:$user" "$instance_store_data_dir"
-    ln -s "$instance_store_data_dir" "$data_dir"
+    echo "$instance_store_data_dir"
+  else
+    # Already created in install-nomad
+    log_info "Nomad will use data_dir: $ebs_data_dir"
+    echo "$ebs_data_dir"
   fi
 }
 
@@ -263,7 +266,6 @@ function run {
 
   local readonly bin_dir="$NOMAD_INSTALL_PATH/bin"
   local readonly config_dir="$NOMAD_INSTALL_PATH/config"
-  local readonly data_dir="$NOMAD_INSTALL_PATH/data"
 
   while [[ $# > 0 ]]; do
     local key="$1"
@@ -318,7 +320,7 @@ function run {
   assert_is_installed "curl"
   assert_is_installed "jq"
 
-  prepare_nomad_data_dir "$data_dir" "$user"
+  local readonly data_dir=$(prepare_nomad_data_dir "$user")
 
   generate_nomad_config "$server" "$client" "$num_servers" "$node_class" "$config_dir" "$data_dir" "$user"
   generate_systemd_config "$user" "$bin_dir" "$config_dir"
