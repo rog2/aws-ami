@@ -99,7 +99,7 @@ function stop_and_disable_docker_service {
 
 function purge_docker_data_dir {
   log_info 'Removing data under /var/lib/docker'
-  sudo rm -rf /var/lib/docker/*
+  sudo rm -rf /var/lib/docker
 }
 
 function copy_docker_run_script {
