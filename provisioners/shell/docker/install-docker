@@ -105,7 +105,7 @@ function purge_docker_data_dir {
 function copy_docker_run_script {
   log_info "Copying Docker run script to $SCRIPT_INSTALL_DIR"
   sudo mkdir -p "$SCRIPT_INSTALL_DIR"
-  sudo cp -vf "$SCRIPT_DIR/run-nomad" "$SCRIPT_INSTALL_DIR"
+  sudo cp -vf "$SCRIPT_DIR/run-docker" "$SCRIPT_INSTALL_DIR"
 }
 
 # =============================================================================
