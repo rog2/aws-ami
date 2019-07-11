@@ -33,7 +33,7 @@
       "Timezone": "{{user `timezone`}}",
       "Java Distribution": "Amazon Corretto",
       "Java Version": "{{user `java_version`}}",
-      "Prometheus Node Exporter Version": "{{user `node_exporter_version`}}",
+      "Node Exporter Version": "{{user `node_exporter_version`}}",
       "Docker Version": "{{user `docker_version`}}",
       "Consul Version": "{{user `consul_version`}}",
       "Nomad Version": "{{user `nomad_version`}}"
@@ -58,8 +58,7 @@
       "BASH_HELPERS=/tmp/bash-helpers.sh",
       "TIMEZONE={{user `timezone`}}",
       "JAVA_VERSION={{user `java_version`}}",
-      "NODE_EXPORTER_VERSION={{user `node_exporter_version`}}",
-      "DOCKER_VERSION={{user `docker_version`}}"
+      "NODE_EXPORTER_VERSION={{user `node_exporter_version`}}"
     ],
     "scripts": [
       "provisioners/shell/apt-mirrors.sh",
@@ -73,8 +72,7 @@
       "provisioners/shell/pip-source.sh",
       "provisioners/shell/awscli.sh",
       "provisioners/shell/java-11-amazon-corretto.sh",
-      "provisioners/shell/prometheus/node-exporter.sh",
-      "provisioners/shell/docker.sh"
+      "provisioners/shell/prometheus/node-exporter.sh"
     ]
   },
   {
@@ -88,6 +86,19 @@
       "cd /tmp/",
       "chmod +x mount-nvme-instance-store",
       "sudo cp -vf mount-nvme-instance-store /var/lib/cloud/scripts/per-instance/"
+    ]
+  },
+  {
+    "type": "file",
+    "source": "provisioners/shell/docker",
+    "destination": "/tmp/"
+  },
+  {
+    "type": "shell",
+    "inline": [
+      "cd /tmp/docker",
+      "chmod +x install-docker",
+      "./install-docker --version {{user `docker_version`}}"
     ]
   },
   {

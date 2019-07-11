@@ -1,0 +1,51 @@
+#!/bin/bash
+
+set -e
+
+# =============================================================================
+
+readonly DOCKER_CONFIG_PATH="/etc/docker/daemon.json"
+
+# cloud-init/mount-nvme-instance-store
+readonly INSTANCE_STORE="/mnt/ephemeral"
+
+# =============================================================================
+
+# Prefer NVMe instance store (if available) as Docker data dir
+function get_docker_data_root {
+  if [[ -d "$INSTANCE_STORE" ]]; then
+    echo "$INSTANCE_STORE/docker"
+  else
+    echo "/var/lib/docker"
+  fi
+}
+
+# https://docs.docker.com/config/daemon/systemd/
+# https://docs.docker.com/engine/reference/commandline/dockerd/#daemon-configuration-file
+function generate_docker_config {
+  local readonly data_root=$(get_docker_data_root)
+  # We do not want duplicate logging,
+  # because Nomad already has this feature.
+  local readonly log_driver="none"
+
+  cat > "$DOCKER_CONFIG_PATH" <<EOF
+{
+  "data-root": "$data_root",
+  "log-driver": "$log_driver"
+}
+EOF
+}
+
+function start_docker {
+  systemctl enable containerd.service
+  systemctl enable docker.service
+  systemctl start containerd.service
+  systemctl start docker.service
+}
+
+function run {
+  generate_docker_config
+  start_docker
+}
+
+run "$@"
