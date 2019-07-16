@@ -24,14 +24,10 @@ function get_docker_data_root {
 # https://docs.docker.com/engine/reference/commandline/dockerd/#daemon-configuration-file
 function generate_docker_config {
   local readonly data_root=$(get_docker_data_root)
-  # We do not want duplicate logging,
-  # because Nomad already has this feature.
-  local readonly log_driver="none"
 
   cat > "$DOCKER_CONFIG_PATH" <<EOF
 {
-  "data-root": "$data_root",
-  "log-driver": "$log_driver"
+  "data-root": "$data_root"
 }
 EOF
 }
