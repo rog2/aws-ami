@@ -177,6 +177,12 @@ client {
     "/run/systemd/resolve"  = "/run/systemd/resolve"
   }
 }
+
+plugin "raw_exec" {
+  config {
+    enabled = true
+  }
+}
 EOF
 )
   fi
