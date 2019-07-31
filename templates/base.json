@@ -141,5 +141,10 @@
       "echo 'Remove ssh key to make the AMI more secure.'",
       "rm -vf ~/.ssh/authorized_keys"
     ]
-  }]
+  }],
+  "post-processors": [
+    {
+      "type": "manifest"
+    }
+  ]
 }
