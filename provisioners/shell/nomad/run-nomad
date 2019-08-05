@@ -188,7 +188,7 @@ plugin "docker" {
   config {
     gc {
       image       = true
-      image_delay = "5m"
+      image_delay = "1h"
       container   = true
     }
   }
