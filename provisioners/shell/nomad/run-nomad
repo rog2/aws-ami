@@ -183,6 +183,16 @@ plugin "raw_exec" {
     enabled = true
   }
 }
+
+plugin "docker" {
+  config {
+    gc {
+      image       = true
+      image_delay = "5m"
+      container   = true
+    }
+  }
+}
 EOF
 )
   fi
