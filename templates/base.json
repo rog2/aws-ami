@@ -10,7 +10,7 @@
     "timezone": "Asia/Shanghai",
     "java_version": "11.0.4.11-1",
     "node_exporter_version": "0.18.1",
-    "docker_version": "18.09.8",
+    "docker_version": "19.03.1",
     "consul_version": "1.5.3",
     "nomad_version": "0.9.4"
   },
