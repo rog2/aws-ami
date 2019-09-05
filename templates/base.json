@@ -10,16 +10,16 @@
     "timezone": "Asia/Shanghai",
     "java_version": "11.0.4.11-1",
     "node_exporter_version": "0.18.1",
-    "docker_version": "19.03.1",
+    "docker_version": "19.03.2",
     "consul_version": "1.5.3",
-    "nomad_version": "0.9.4"
+    "nomad_version": "0.9.5"
   },
   "builders": [{
     "type": "amazon-ebs",
     "region": "{{user `region`}}",
     "source_ami": "{{user `source_ami`}}",
     "ami_name": "{{user `ami_name`}}",
-    "ami_description": "The AMI that other AMIs based on.",
+    "ami_description": "The golden image that other AMIs based on.",
     "instance_type": "{{user `instance_type`}}",
     "iam_instance_profile": "{{user `iam_instance_profile`}}",
     "ssh_username": "ubuntu",
