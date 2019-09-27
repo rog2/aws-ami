@@ -10,7 +10,7 @@ sudo systemctl stop apport.service
 sudo systemctl disable apport.service
 
 echo 'Configuring core pattern...'
-echo 'kernel.core_pattern=core.%p' | sudo tee $CORE_PATTERN_CONF
+echo 'kernel.core_pattern=core.%e.%p' | sudo tee $CORE_PATTERN_CONF
 
 sudo sysctl -p $CORE_PATTERN_CONF
 
