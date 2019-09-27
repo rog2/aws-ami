@@ -12,6 +12,7 @@ DEPS="
   unrar
   htop
   ifstat
+  sysstat
   coreutils
   tree
   jq
