@@ -6,6 +6,7 @@ sudo apt-get update
 
 # Common packages across all versions
 DEPS="
+  linux-tools-aws
   apt-show-versions
   nvme-cli
   unzip
