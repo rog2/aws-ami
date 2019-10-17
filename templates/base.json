@@ -8,11 +8,11 @@
     "instance_type": "t3.micro",
     "iam_instance_profile": "packer-ec2",
     "timezone": "Asia/Shanghai",
-    "java_version": "11.0.4.11-1",
+    "java_version": "11.0.5.10-1",
     "node_exporter_version": "0.18.1",
-    "docker_version": "19.03.2",
+    "docker_version": "19.03.3",
     "consul_version": "1.5.3",
-    "nomad_version": "0.9.5"
+    "nomad_version": "0.9.6"
   },
   "builders": [{
     "type": "amazon-ebs",
