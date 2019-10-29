@@ -33,7 +33,7 @@ function print_usage {
   echo -e "  --client\t\tIf set, run in client mode. Optional. At least one of --server or --client must be set."
   echo -e "  --num-servers\t\tThe number of servers to expect in the Nomad cluster. Required if --server is true."
   echo -e "  --node-class\t\tThe node_class of nomad client. Optional if --client is true."
-  echo -e "  --meta\t\tThe meta of nomad client. Optional if --client is true. Provide key=value format string. Can be set more than once."
+  echo -e "  --meta\t\tThe meta of nomad client. Optional if --client is true. Provide key=value,key=value... format string."
   echo
   echo "Example:"
   echo
@@ -135,7 +135,7 @@ function generate_nomad_config {
   local readonly config_dir="$5"
   local readonly data_dir="$6"
   local readonly user="$7"
-  eval "declare -A meta="${8#*=}
+  local readonly meta="$8"
   local readonly config_path="$config_dir/$NOMAD_CONFIG_FILE"
 
   local instance_id=""
@@ -161,6 +161,12 @@ EOF
 
   local client_config=""
   if [[ "$client" == "true" ]]; then
+    meta_block=$(python3 meta-renderer.py "$meta" 2)
+    if [ $? -ne 0 ]; then
+      log_error "Meta render failed."
+      exit 1
+    fi
+
     client_config=$(cat <<EOF
 client {
   enabled = true
@@ -178,9 +184,7 @@ client {
     "/run/resolvconf"       = "/run/resolvconf"
     "/run/systemd/resolve"  = "/run/systemd/resolve"
   }
-  meta {
-$(for key in ${!meta[@]}; do echo $key = \"${meta[$key]}\"; done | sed 's/^/    /')
-  }
+$meta_block
 }
 
 plugin "raw_exec" {
@@ -287,9 +291,7 @@ function run {
   local num_servers=""
   local node_class=""
   local user=""
-
-  # declare associative array
-  declare -A meta=()
+  local meta=""
 
   local readonly bin_dir="$NOMAD_INSTALL_PATH/bin"
   local readonly config_dir="$NOMAD_INSTALL_PATH/config"
@@ -313,9 +315,7 @@ function run {
         shift
         ;;
       --meta)
-        meta_key=$(echo $2 | cut -d= -f1)
-        meta_value=$(echo $2 | cut -d= -f2)
-        meta[$meta_key]=$meta_value
+        meta="$2"
         shift
         ;;
       --help)
@@ -355,7 +355,7 @@ function run {
 
   local readonly data_dir=$(prepare_nomad_data_dir "$user")
 
-  generate_nomad_config "$server" "$client" "$num_servers" "$node_class" "$config_dir" "$data_dir" "$user" "$(declare -p meta)"
+  generate_nomad_config "$server" "$client" "$num_servers" "$node_class" "$config_dir" "$data_dir" "$user" "$meta"
   generate_systemd_config "$user" "$bin_dir" "$config_dir"
 
   start_nomad
