@@ -161,14 +161,9 @@ EOF
 
   local client_config=""
   local meta_block=""
-  local meta_render="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"/meta-renderer
+  local meta_renderer="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"/meta-renderer
   if [[ "$client" == "true" ]]; then
-    meta_block=$("$meta_render" --indent 2 "$meta")
-    if [ $? -ne 0 ]; then
-      log_error "Meta render failed."
-      exit 1
-    fi
-
+    meta_block=$("$meta_renderer" --indent 2 "$meta")
     client_config=$(cat <<EOF
 client {
   enabled = true
