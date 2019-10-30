@@ -13,7 +13,7 @@ def parse_args():
     '''
     parser = argparse.ArgumentParser(description='Render nomad client meta block with passed in meta string.')
     parser.add_argument('meta', help='Meta string.')
-    parser.add_argument('indent', type=int, default=0, help='Indent.')
+    parser.add_argument('-i', '--indent', dest='indent', type=int, default=0, help='Indent.')
     
     args = parser.parse_args()
     return args.meta, args.indent

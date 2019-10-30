@@ -160,8 +160,9 @@ EOF
   fi
 
   local client_config=""
+  local meta_block=""
   if [[ "$client" == "true" ]]; then
-    meta_block=$(python3 meta-renderer.py "$meta" 2)
+    meta_block=$(./meta-renderer --indent 2 "$meta")
     if [ $? -ne 0 ]; then
       log_error "Meta render failed."
       exit 1
