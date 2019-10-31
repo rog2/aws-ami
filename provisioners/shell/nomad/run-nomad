@@ -9,6 +9,8 @@ set -e
 
 # =============================================================================
 
+readonly SCRIPT_NAME="$(basename "$0")"
+
 readonly NOMAD_USER="nomad"
 readonly NOMAD_INSTALL_PATH="/opt/nomad"
 readonly NOMAD_CONFIG_FILE="default.hcl"
