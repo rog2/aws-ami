@@ -1,0 +1,133 @@
+#!/bin/bash
+
+set -e
+
+# =============================================================================
+
+readonly SCRIPT_NAME="$(basename "$0")"
+
+# =============================================================================
+
+function print_usage {
+  echo
+  echo "Usage: ebs-init [OPTIONS]"
+  echo
+  echo "This script is used to format and mount attached EBS volume on EC2."
+  echo
+  echo "If the volume is a raw block device, an ext4 filesystem will be created."
+  echo
+  echo "Options:"
+  echo
+  echo -e "  --device-name    Required. The device name in the block device mapping, like /dev/sdf"
+  echo -e "  --mount-point    Required. The mount point (directory) of the device, like /mnt/data"
+  echo
+  echo "Example:"
+  echo
+  echo "  ebs-init --device-name /dev/sdf --mount-point /mnt/data"
+}
+
+function log {
+  local readonly level="$1"
+  local readonly message="$2"
+  local readonly timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+  >&2 echo -e "${timestamp} [${level}] [$SCRIPT_NAME] ${message}"
+}
+
+function log_info {
+  local readonly message="$1"
+  log "INFO" "$message"
+}
+
+function log_warn {
+  local readonly message="$1"
+  log "WARN" "$message"
+}
+
+function log_error {
+  local readonly message="$1"
+  log "ERROR" "$message"
+}
+
+function assert_not_empty {
+  local readonly arg_name="$1"
+  local readonly arg_value="$2"
+
+  if [[ -z "$arg_value" ]]; then
+    log_error "The value for '$arg_name' cannot be empty"
+    print_usage
+    exit 1
+  fi
+}
+
+function assert_running_as_root {
+  if [[ "$EUID" -ne 0 ]]; then
+    log_error "Please run as root."
+    exit 1
+  fi
+}
+
+function format_volume {
+  local readonly device_name="$1"
+  local readonly device_fs=$(lsblk -f -n -o fstype $device_name)
+  if [[ -z "$device_fs" ]]; then
+    log_info "$device_name has no filesystem, creating ext4 now."
+    mkfs.ext4 -E nodiscard -m0 "$device_name" 1>&2
+    echo "ext4"
+  else
+    log_info "$device_name contains a $device_fs filesystem, keeping it that way."
+    echo "$device_fs"
+  fi
+}
+
+function mount_volume {
+  local readonly device_name="$1"
+  local readonly device_fs="$2"
+  local readonly mount_point="$3"
+  log_info "Mounting $device_fs volume $device_name to $mount_point"
+  mkdir -p "$mount_point"
+  echo "$device_name $mount_point $device_fs defaults 0 0" | tee -a /etc/fstab
+  mount -a
+}
+
+# =============================================================================
+
+function run {
+  local device_name=""
+  local mount_point=""
+
+  while [[ $# > 0 ]]; do
+    local key="$1"
+
+    case "$key" in
+      --device-name)
+        device_name="$2"
+        shift
+        ;;
+      --mount-point)
+        mount_point="$2"
+        shift
+        ;;
+      --help)
+        print_usage
+        exit
+        ;;
+      *)
+        log_error "Unrecognized argument: $key"
+        print_usage
+        exit 1
+        ;;
+    esac
+
+    shift
+  done
+
+  assert_not_empty "--device-name" "$device_name"
+  assert_not_empty "--mount-point" "$mount_point"
+
+  assert_running_as_root
+
+  local readonly device_fs=$(format_volume "$device_name")
+  mount_volume "$device_name" "$device_fs" "$mount_point"
+}
+
+run "$@"

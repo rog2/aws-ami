@@ -85,8 +85,21 @@
     "type": "shell",
     "inline": [
       "cd /tmp/",
-      "chmod +x mount-nvme-instance-store",
-      "sudo cp -vf mount-nvme-instance-store /var/lib/cloud/scripts/per-instance/"
+      "sudo install -v mount-nvme-instance-store /var/lib/cloud/scripts/per-instance/"
+    ]
+  },
+  {
+    "type": "file",
+    "source": "provisioners/shell/ebs",
+    "destination": "/tmp/"
+  },
+  {
+    "type": "shell",
+    "inline": [
+      "cd /tmp/ebs",
+      "sudo install -v ebs-nvme-id /usr/local/bin/",
+      "sudo install -v -m 644 99-ebs-nvme.rules /etc/udev/rules.d/",
+      "sudo install -v ebs-init /usr/local/bin/"
     ]
   },
   {

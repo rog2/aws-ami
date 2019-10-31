@@ -1,0 +1,7 @@
+# Create symbolic links from the device names in the block device mappings to the NVMe device names.
+# Example:
+#   /dev/sda1 -> /dev/nvme0n1
+#   /dev/sdf  -> /dev/nvme1n1
+
+KERNEL=="nvme[0-9]*n[0-9]*",        ENV{DEVTYPE}=="disk",       ATTRS{model}=="Amazon Elastic Block Store", PROGRAM="/usr/local/bin/ebs-nvme-id -u /dev/%k", SYMLINK+="%c"
+KERNEL=="nvme[0-9]*n[0-9]*p[0-9]*", ENV{DEVTYPE}=="partition",  ATTRS{model}=="Amazon Elastic Block Store", PROGRAM="/usr/local/bin/ebs-nvme-id -u /dev/%k", SYMLINK+="%c%n"
