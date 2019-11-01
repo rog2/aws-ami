@@ -4,7 +4,7 @@
       "region": null,
       "subnet_id": null,
       "source_ami": null,
-      "ami_name": "ubuntu/18.04/elk-6.x/{{isotime \"20060102T030405Z\"}}",
+      "ami_name": "ubuntu/18.04/elk-6.x/{{isotime \"20060102T150405Z\"}}",
       "iam_instance_profile": "packer-ec2"
     },
     "builders": [{

@@ -4,7 +4,7 @@
       "region": null,
       "subnet_id": null,
       "source_ami": null,
-      "ami_name": "ubuntu/18.04/opendistro-for-elasticsearch/{{isotime \"20060102T030405Z\"}}",
+      "ami_name": "ubuntu/18.04/opendistro-for-elasticsearch/{{isotime \"20060102T150405Z\"}}",
       "iam_instance_profile": "packer-ec2",
       "odfe_version": "0.9.0",
       "elasticsearch_oss_version": "6.7.1"
