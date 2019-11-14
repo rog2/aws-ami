@@ -11,8 +11,8 @@
     "java_version": "11.0.5.10-1",
     "node_exporter_version": "0.18.1",
     "docker_version": "19.03.4",
-    "consul_version": "1.5.3",
-    "nomad_version": "0.9.6"
+    "consul_version": "1.6.1",
+    "nomad_version": "0.10.1"
   },
   "builders": [{
     "type": "amazon-ebs",
