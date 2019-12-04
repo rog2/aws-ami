@@ -61,12 +61,14 @@ function assert_not_empty {
 
 function install_docker_ce {
   local readonly version="$1"
+  local readonly arch=$(dpkg --print-architecture)
+  local readonly codename=$(lsb_release -cs)
 
   log_info "Add Docker's official GPG Key"
   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 
   log_info "Add Docker's apt repository (stable)"
-  echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list
+  echo "deb [arch=${arch}] https://download.docker.com/linux/ubuntu ${codename} stable" | sudo tee /etc/apt/sources.list.d/docker.list
 
   log_info 'Verify apt-key fingerprint'
   apt-key fingerprint 0EBFCD88

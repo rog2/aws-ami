@@ -120,10 +120,11 @@ function install_nomad_binary {
   local readonly path="$2"
   local readonly username="$3"
 
+  local readonly arch=$(dpkg --print-architecture)
   local readonly tmp_dir=$(mktemp --tmpdir=/tmp --directory nomad-XXXXXXXX)
   local readonly download_path="$tmp_dir/nomad.zip"
 
-  local readonly url="https://releases.hashicorp.com/nomad/${version}/nomad_${version}_linux_amd64.zip"
+  local readonly url="https://releases.hashicorp.com/nomad/${version}/nomad_${version}_linux_${arch}.zip"
   local readonly bin_dir="$path/bin"
   local readonly nomad_dest_path="$bin_dir/nomad"
   local readonly run_nomad_dest_path="$bin_dir/run-nomad"

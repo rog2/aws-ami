@@ -3,9 +3,10 @@
 set -e
 
 function get_latest_release {
+  local readonly arch=$(dpkg --print-architecture)
   curl -s https://api.github.com/repos/$1/releases/latest |
     grep browser_download_url |
-    grep linux-amd64 |
+    grep "linux-${arch}" |
     sed -E 's/.*"([^"]+)".*/\1/'
 }
 

@@ -133,7 +133,8 @@ function download {
 
 function fetch_consul_binary {
   local readonly version="$1"
-  local readonly download_url="https://releases.hashicorp.com/consul/${version}/consul_${version}_linux_amd64.zip"
+  local readonly arch=$(dpkg --print-architecture)
+  local readonly download_url="https://releases.hashicorp.com/consul/${version}/consul_${version}_linux_${arch}.zip"
   log_info "Downloading Consul to $CONSUL_DOWNLOAD_PATH"
   download "$download_url" "$CONSUL_DOWNLOAD_PATH"
 }
