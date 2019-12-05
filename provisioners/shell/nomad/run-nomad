@@ -155,6 +155,7 @@ function generate_nomad_config {
     server_config=$(cat <<EOF
 server {
   enabled = true
+  raft_protocol = 3
   bootstrap_expect = $num_servers
 }
 EOF
