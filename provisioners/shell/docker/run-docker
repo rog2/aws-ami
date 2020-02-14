@@ -27,7 +27,8 @@ function generate_docker_config {
 
   cat > "$DOCKER_CONFIG_PATH" <<EOF
 {
-  "data-root": "$data_root"
+  "data-root": "$data_root",
+  "insecure-registries": ["docker.service.consul:5000"]
 }
 EOF
 }
