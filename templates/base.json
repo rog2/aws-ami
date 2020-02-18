@@ -70,8 +70,7 @@
       "provisioners/shell/kernel-tuning.sh",
       "provisioners/shell/chrony.sh",
       "provisioners/shell/timezone.sh",
-      "provisioners/shell/pip-source.sh",
-      "provisioners/shell/awscli.sh",
+      "provisioners/shell/awscliv2.sh",
       "provisioners/shell/java-11-amazon-corretto.sh",
       "provisioners/shell/prometheus/node-exporter.sh"
     ]
