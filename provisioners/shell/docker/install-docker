@@ -64,11 +64,19 @@ function install_docker_ce {
   local readonly arch=$(dpkg --print-architecture)
   local readonly codename=$(lsb_release -cs)
 
+  # Use aliyun's mirror of Docker CE, if in AWS China regions.
+  # https://developer.aliyun.com/mirror/docker-ce
+  local readonly az=$(ec2metadata --availability-zone)
+  local repo_url="https://download.docker.com/linux/ubuntu"
+  if [[ $az == cn-* ]]; then
+    repo_url="https://mirrors.aliyun.com/docker-ce/linux/ubuntu"
+  fi
+
   log_info "Add Docker's official GPG Key"
   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 
   log_info "Add Docker's apt repository (stable)"
-  echo "deb [arch=${arch}] https://download.docker.com/linux/ubuntu ${codename} stable" | sudo tee /etc/apt/sources.list.d/docker.list
+  echo "deb [arch=${arch}] ${repo_url} ${codename} stable" | sudo tee /etc/apt/sources.list.d/docker.list
 
   log_info 'Verify apt-key fingerprint'
   apt-key fingerprint 0EBFCD88
