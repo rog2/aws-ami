@@ -1,6 +1,6 @@
 # Docker
 
-Install and run [Docker CE][https://docs.docker.com/install/].
+Install and run [Docker CE (stable)](https://docs.docker.com/install/).
 
 Inspired by [run-consul](../consul/run-consul) and [run-nomad](../nomad/run-nomad).
 
