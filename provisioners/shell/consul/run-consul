@@ -269,6 +269,7 @@ EOF
   "ports": {
     "dns": 53
   },
+  "recursors": ["169.254.169.253"],
   "datacenter": "$datacenter",
   "node_name": "$instance_id",
   $bootstrap_expect
