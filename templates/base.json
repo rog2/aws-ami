@@ -6,7 +6,8 @@
     "subnet_id": "",
     "source_ami": "",
     "source_ami_owner": "837727238323",
-    "ami_name": "ubuntu/18.04/base/{{isotime \"20060102T150405Z\"}}",
+    "os_arch": "amd64",
+    "ami_name": "ubuntu/18.04/{{user `os_arch`}}/{{isotime \"20060102T150405Z\"}}",
     "instance_type": "t3.micro",
     "iam_instance_profile": "packer-ec2",
     "timezone": "Asia/Shanghai",
@@ -23,7 +24,7 @@
     "source_ami": "{{user `source_ami`}}",
     "source_ami_filter": {
       "filters": {
-        "name": "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*",
+        "name": "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-{{user `os_arch`}}-server-*",
         "virtualization-type": "hvm",
         "root-device-type": "ebs"
       },
@@ -42,11 +43,12 @@
     "subnet_id": "{{user `subnet_id`}}",
     "tags": {
       "Name": "{{user `ami_name`}}",
+      "build_region": "{{ .BuildRegion }}",
       "source_ami": "{{ .SourceAMI }}",
       "source_ami_name": "{{ .SourceAMIName }}",
-      "os": "Linux",
-      "os_distro": "Ubuntu",
+      "os_name": "Ubuntu",
       "os_version": "18.04",
+      "os_arch": "{{user `os_arch`}}",
       "timezone": "{{user `timezone`}}",
       "java_distro": "Amazon Corretto",
       "java_version": "{{user `java_version`}}",
