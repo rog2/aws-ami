@@ -73,13 +73,13 @@ function install_docker_ce {
   fi
 
   log_info "Add Docker's official GPG Key"
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1 apt-key add -
 
   log_info "Add Docker's apt repository (stable)"
   echo "deb [arch=${arch}] ${repo_url} ${codename} stable" | sudo tee /etc/apt/sources.list.d/docker.list
 
   log_info 'Verify apt-key fingerprint'
-  apt-key fingerprint 0EBFCD88
+  APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1 apt-key fingerprint 0EBFCD88
 
   log_info 'apt-get update'
   sudo apt-get update

@@ -20,7 +20,7 @@ fi
 echo "Ubuntu Codename is $CODENAME"
 
 echo 'Adding nginx signing key ...'
-wget -q -O - https://nginx.org/keys/nginx_signing.key | apt-key add -
+wget -q -O - https://nginx.org/keys/nginx_signing.key | APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1 apt-key add -
 
 echo 'Adding nginx repository to apt source list ...'
 echo '# Stable version' >> $APT_SOURCE_FILE
