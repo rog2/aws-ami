@@ -1,9 +1,11 @@
 {
-  "description": "The Golden Image which has all common packages installed.\nBased on Ubuntu Server 18.04",
+  "description": "Linux golden image based on Ubuntu 18.04",
   "variables": {
-    "region": null,
-    "subnet_id": null,
-    "source_ami": null,
+    "region": "cn-northwest-1",
+    "regions_to_copy": "cn-north-1",
+    "subnet_id": "",
+    "source_ami": "",
+    "source_ami_owner": "837727238323",
     "ami_name": "ubuntu/18.04/base/{{isotime \"20060102T150405Z\"}}",
     "instance_type": "t3.micro",
     "iam_instance_profile": "packer-ec2",
@@ -17,9 +19,19 @@
   "builders": [{
     "type": "amazon-ebs",
     "region": "{{user `region`}}",
+    "ami_regions": "{{user `regions_to_copy`}}",
     "source_ami": "{{user `source_ami`}}",
+    "source_ami_filter": {
+      "filters": {
+        "name": "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*",
+        "virtualization-type": "hvm",
+        "root-device-type": "ebs"
+      },
+      "owners": "{{user `source_ami_owner`}}",
+      "most_recent": true
+    },
     "ami_name": "{{user `ami_name`}}",
-    "ami_description": "The golden image that other AMIs based on.",
+    "ami_description": "Linux golden image based on Ubuntu 18.04",
     "instance_type": "{{user `instance_type`}}",
     "iam_instance_profile": "{{user `iam_instance_profile`}}",
     "communicator": "ssh",
