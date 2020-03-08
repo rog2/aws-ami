@@ -98,10 +98,10 @@ def parse_host_volumes_string(s):
 
 def create_volume_paths(volumes):
     for v in volumes:
-        mkdir = f"sudo mkdir -p {v['path']}"
+        mkdir = f"mkdir -p {v['path']}"
         if os.system(mkdir) != 0:
             exit(1, f"Failed to execute command: {mkdir}")
-        chown = f"sudo chown {v['owner']}:{v['group']} {v['path']}"
+        chown = f"chown {v['owner']}:{v['group']} {v['path']}"
         if os.system(chown) != 0:
             exit(1, f"Failed to execute command: {chown}")
 
