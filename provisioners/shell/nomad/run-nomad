@@ -36,6 +36,7 @@ function print_usage {
   echo -e "  --num-servers\t\tThe number of servers to expect in the Nomad cluster. Required if --server is true."
   echo -e "  --node-class\t\tThe node_class of nomad client. Optional if --client is true."
   echo -e "  --meta\t\tThe meta of nomad client. Optional if --client is true. Provide key=value,key=value... format string."
+  echo -e "  --host-volumes\tHost volumes to be made available to jobs. Optional if --client is true. Format is name:path:owner:group:read_only,..."
   echo
   echo "Example:"
   echo
@@ -138,6 +139,7 @@ function generate_nomad_config {
   local readonly data_dir="$6"
   local readonly user="$7"
   local readonly meta="$8"
+  local readonly host_volumes="$9"
   local readonly config_path="$config_dir/$NOMAD_CONFIG_FILE"
 
   local instance_id=""
@@ -164,9 +166,10 @@ EOF
 
   local client_config=""
   local meta_block=""
-  local meta_renderer="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"/meta-renderer
+  local nomad_helper="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"/nomad-helper
   if [[ "$client" == "true" ]]; then
-    meta_block=$("$meta_renderer" --indent 2 "$meta")
+    meta_block=$("$nomad_helper" meta --indent 2 "$meta")
+    host_volumes_stanzas=$("$nomad_helper" host-volumes --indent 2 "$host_volumes")
     client_config=$(cat <<EOF
 client {
   enabled = true
@@ -185,6 +188,7 @@ client {
     "/run/systemd/resolve"  = "/run/systemd/resolve"
   }
 $meta_block
+$host_volumes_stanzas
 }
 
 plugin "raw_exec" {
@@ -292,6 +296,7 @@ function run {
   local node_class=""
   local user=""
   local meta=""
+  local host_volumes=""
 
   local readonly bin_dir="$NOMAD_INSTALL_PATH/bin"
   local readonly config_dir="$NOMAD_INSTALL_PATH/config"
@@ -316,6 +321,10 @@ function run {
         ;;
       --meta)
         meta="$2"
+        shift
+        ;;
+      --host-volumes)
+        host_volumes="$2"
         shift
         ;;
       --help)
@@ -355,7 +364,7 @@ function run {
 
   local readonly data_dir=$(prepare_nomad_data_dir "$user")
 
-  generate_nomad_config "$server" "$client" "$num_servers" "$node_class" "$config_dir" "$data_dir" "$user" "$meta"
+  generate_nomad_config "$server" "$client" "$num_servers" "$node_class" "$config_dir" "$data_dir" "$user" "$meta" "$host_volumes"
   generate_systemd_config "$user" "$bin_dir" "$config_dir"
 
   start_nomad

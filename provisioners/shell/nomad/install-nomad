@@ -128,7 +128,7 @@ function install_nomad_binary {
   local readonly bin_dir="$path/bin"
   local readonly nomad_dest_path="$bin_dir/nomad"
   local readonly run_nomad_dest_path="$bin_dir/run-nomad"
-  local readonly meta_renderer_dest_path="$bin_dir/meta-renderer"
+  local readonly nomad_helper_dest_path="$bin_dir/nomad-helper"
 
   log_info "Downloading Nomad $version from $url to $download_path"
   download "$url" "$download_path"
@@ -149,8 +149,8 @@ function install_nomad_binary {
 
   log_info "Copying Nomad run script to $run_nomad_dest_path"
   sudo install -v -o "$username" -g "$username" -m 755 "$SCRIPT_DIR/run-nomad" "$run_nomad_dest_path"
-  log_info "Copying meta renderer script to $meta_renderer_dest_path"
-  sudo install -v -o "$username" -g "$username" -m 755 "$SCRIPT_DIR/meta-renderer" "$meta_renderer_dest_path"
+  log_info "Copying nomad helper script to $nomad_helper_dest_path"
+  sudo install -v -o "$username" -g "$username" -m 755 "$SCRIPT_DIR/nomad-helper" "$nomad_helper_dest_path"
 }
 
 # =============================================================================
