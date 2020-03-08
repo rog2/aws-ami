@@ -73,8 +73,9 @@ def render_meta_block(meta_dict, indent):
 
 
 def meta_command(args):
-    meta_dict = parse_meta_string(args.meta)
-    render_meta_block(meta_dict, args.indent)
+    if args.meta:
+        meta_dict = parse_meta_string(args.meta)
+        render_meta_block(meta_dict, args.indent)
 
 
 # ===== Command host-volume =====
@@ -125,9 +126,10 @@ def render_host_volume_stanzas(volumes, indent):
 
 
 def host_volumes_command(args):
-    volumes = parse_host_volumes_string(args.host_volumes)
-    create_volume_paths(volumes)
-    render_host_volume_stanzas(volumes, args.indent)
+    if args.host_volumes:
+        volumes = parse_host_volumes_string(args.host_volumes)
+        create_volume_paths(volumes)
+        render_host_volume_stanzas(volumes, args.indent)
 
 
 def log(message):
