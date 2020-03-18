@@ -13,8 +13,8 @@
     "timezone": "Asia/Shanghai",
     "java_version": "11.0.6.10-1",
     "node_exporter_version": "0.18.1",
-    "docker_version": "19.03.6",
-    "consul_version": "1.7.1",
+    "docker_version": "19.03.8",
+    "consul_version": "1.7.2",
     "nomad_version": "0.10.4"
   },
   "builders": [{
