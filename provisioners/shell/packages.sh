@@ -9,6 +9,7 @@ DEPS="
   linux-tools-aws
   apt-show-versions
   nvme-cli
+  zip
   unzip
   unrar
   htop
