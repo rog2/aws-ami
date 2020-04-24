@@ -2,8 +2,6 @@
 
 We use [Packer](https://www.packer.io/) with [Jenkins](https://wiki.jenkins-ci.org/display/JENKINS/Packer+Plugin) to bake AMIs automatically.
 
-The OS is **Ubuntu Server 18.04 LTS**.
-
 ## Prerequisites
 
 Create an **AWS IAM Role** with name `packer-ec2` and attach managed policy **AmazonS3ReadOnlyAccess**.
