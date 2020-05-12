@@ -14,7 +14,7 @@
     "java_version": "11.0.7.10-1",
     "node_exporter_version": "0.18.1",
     "docker_version": "19.03.8",
-    "consul_version": "1.7.2",
+    "consul_version": "1.7.3",
     "nomad_version": "0.11.1"
   },
   "builders": [{
