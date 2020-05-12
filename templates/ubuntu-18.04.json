@@ -83,7 +83,7 @@
       "provisioners/shell/chrony.sh",
       "provisioners/shell/timezone.sh",
       "provisioners/shell/awscliv2.sh",
-      "provisioners/shell/java-11-amazon-corretto.sh",
+      "provisioners/shell/java-amazon-corretto.sh",
       "provisioners/shell/prometheus/node-exporter.sh"
     ]
   },
