@@ -12,10 +12,10 @@
     "iam_instance_profile": "packer-ec2",
     "timezone": "Asia/Shanghai",
     "java_version": "11.0.7.10-1",
-    "node_exporter_version": "0.18.1",
-    "docker_version": "19.03.9",
-    "consul_version": "1.7.3",
-    "nomad_version": "0.11.2"
+    "node_exporter_version": "1.0.1",
+    "docker_version": "19.03.11",
+    "consul_version": "1.7.4",
+    "nomad_version": "0.11.3"
   },
   "builders": [{
     "type": "amazon-ebs",
