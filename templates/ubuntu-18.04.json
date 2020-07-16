@@ -11,7 +11,7 @@
     "instance_type": "t3.micro",
     "iam_instance_profile": "packer-ec2",
     "timezone": "Asia/Shanghai",
-    "java_version": "11.0.7.10-1",
+    "java_version": "11.0.8.10-1",
     "node_exporter_version": "1.0.1",
     "docker_version": "19.03.12",
     "consul_version": "1.8.0",
