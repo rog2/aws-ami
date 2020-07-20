@@ -1,6 +1,5 @@
 # ---------------------------------------------------------------------------------------------------------------------
-# Match the new version of Packer 1.6.0
-# Convert from json to hcl for each of these parameters.
+# Added HCL format support
 # ---------------------------------------------------------------------------------------------------------------------
 variable "region" {
   description = "The type of EC2 Instances to run for each node in the Regional area id."
@@ -13,71 +12,71 @@ variable "regions_to_copy" {
 }
 
 variable "subnet_id" {
-  type        = string
-  default     = null
+  type    = string
+  default = null
 }
 
 variable "source_ami" {
-  type        = list(string)
-  default     = []
+  type    = list(string)
+  default = []
 }
 
 variable "source_ami_owner" {
-  type        = string
-  default     = "837727238323"
+  type    = string
+  default = "837727238323"
 }
 
 variable "os_arch" {
-  type        = string
-  default     = "amd64"
+  type    = string
+  default = "amd64"
 }
 
 variable "ami_name" {
-  type        = string
-  default     = "ubuntu/18.04/{{user `os_arch`}}/{{isotime \"20060102T150405Z\"}}"
+  type    = string
+  default = "ubuntu/18.04/{{user `os_arch`}}/{{isotime \"20060102T150405Z\"}}"
 }
 
 variable "instance_type" {
-  type        = string
-  default     = "t3.micro"
+  type    = string
+  default = "t3.micro"
 }
 
 variable "iam_instance_profile" {
-  type        = string
-  default     = "packer-ec2"
+  type    = string
+  default = "packer-ec2"
 }
 
 variable "timezone" {
-  type        = string
-  default     = "Asia/Shanghai"
+  type    = string
+  default = "Asia/Shanghai"
 }
 
 variable "java_version" {
-  type        = string
-  default     = "11.0.7.10-1"
+  type    = string
+  default = "11.0.7.10-1"
 }
 
 variable "node_exporter_version" {
-  type        = string
-  default     = "1.0.1"
+  type    = string
+  default = "1.0.1"
 }
 
 variable "docker_version" {
-  type        = string
-  default     = "19.03.12"
+  type    = string
+  default = "19.03.12"
 }
 
 variable "consul_version" {
-  type        = string
-  default     = "1.8.0"
+  type    = string
+  default = "1.8.0"
 }
 
 variable "nomad_version" {
-  type        = string
-  default     = "0.12.0"
+  type    = string
+  default = "0.12.0"
 }
 
-source "amazon-ebs" "ubuntu"  {
+source "amazon-ebs" "ubuntu" {
   ami_description = "Linux golden image based on Ubuntu 18.04"
 
   ami_name = var.ami_name
@@ -102,15 +101,15 @@ source "amazon-ebs" "ubuntu"  {
 
   source_ami_filter = {
     filters = {
-      name = "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-${var.os_arch}-server-*"
-      root-device-type = "ebs"
+      name                = "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-${var.os_arch}-server-*"
+      root-device-type    = "ebs"
       virtualization-type = "hvm"
     }
-       most_recent = true
-       owners = var.source_ami_owner
+    most_recent = true
+    owners      = var.source_ami_owner
   }
 
-   ssh_clear_authorized_keys = true
+  ssh_clear_authorized_keys = true
 
   subnet_id = var.subnet_id
 
@@ -143,110 +142,110 @@ source "amazon-ebs" "ubuntu"  {
 
     timezone = var.timezone
   }
-  
-   provisioners "file"{
-    source = "provisioners/shell/bash-helpers.sh"
-    destination = "/tmp/"
-}
 
-   provisioners "file" {
-    source = "provisioners/shell/cloud-init/mount-nvme-instance-store"
+  provisioners "file" {
+    source      = "provisioners/shell/bash-helpers.sh"
     destination = "/tmp/"
-}
+  }
 
-   provisioners "file"{
-    source = "provisioners/shell/ebs"
+  provisioners "file" {
+    source      = "provisioners/shell/cloud-init/mount-nvme-instance-store"
     destination = "/tmp/"
-}
+  }
 
-   provisioners "file" {
-    source = "provisioners/shell/docker"
+  provisioners "file" {
+    source      = "provisioners/shell/ebs"
     destination = "/tmp/"
-}
+  }
 
-   provisioners "file" {
-    source = "provisioners/shell/consul"
+  provisioners "file" {
+    source      = "provisioners/shell/docker"
     destination = "/tmp/"
-}
+  }
 
-   provisioners "file" {
-    source = "provisioners/shell/nomad"
+  provisioners "file" {
+    source      = "provisioners/shell/consul"
     destination = "/tmp/"
-}
+  }
+
+  provisioners "file" {
+    source      = "provisioners/shell/nomad"
+    destination = "/tmp/"
+  }
 }
 
 build {
 
-provisioner "shell-local"  {
- environment_vars = {
-  "BASH_HELPERS"="/tmp/bash-helpers.sh"
-	"TIMEZONE"="{var.timezone}"
-	"JAVA_VERSION"="{var.java_version}"
-	"NODE_EXPORTER_VERSION"="{var.node_exporter_version}"
+  provisioner "shell-local" {
+    environment_vars = {
+      "BASH_HELPERS"          = "/tmp/bash-helpers.sh"
+      "TIMEZONE"              = "{var.timezone}"
+      "JAVA_VERSION"          = "{var.java_version}"
+      "NODE_EXPORTER_VERSION" = "{var.node_exporter_version}"
+    }
+    scripts = [
+      "provisioners/shell/apt-mirrors.sh",
+      "provisioners/shell/apt-upgrade.sh",
+      "provisioners/shell/apt-daily-conf.sh",
+      "provisioners/shell/packages.sh",
+      "provisioners/shell/journald-conf.sh",
+      "provisioners/shell/core-pattern.sh",
+      "provisioners/shell/kernel-tuning.sh",
+      "provisioners/shell/chrony.sh",
+      "provisioners/shell/timezone.sh",
+      "provisioners/shell/awscliv2.sh",
+      "provisioners/shell/java-amazon-corretto.sh",
+      "provisioners/shell/prometheus/node-exporter.sh"
+    ]
   }
-  scripts = [
-    "provisioners/shell/apt-mirrors.sh",
-    "provisioners/shell/apt-upgrade.sh",
-    "provisioners/shell/apt-daily-conf.sh",
-    "provisioners/shell/packages.sh", 
-    "provisioners/shell/journald-conf.sh",
-    "provisioners/shell/core-pattern.sh", 
-    "provisioners/shell/kernel-tuning.sh", 
-    "provisioners/shell/chrony.sh",
-    "provisioners/shell/timezone.sh", 
-    "provisioners/shell/awscliv2.sh", 
-    "provisioners/shell/java-amazon-corretto.sh", 
-    "provisioners/shell/prometheus/node-exporter.sh"
-  ]
-}
-provisioner "shell" {
-  inline = [
-  "cd /tmp/", 
-  "sudo install -v mount-nvme-instance-store /var/lib/cloud/scripts/per-instance/"
-  ]
-}
+  provisioner "shell" {
+    inline = [
+      "cd /tmp/",
+      "sudo install -v mount-nvme-instance-store /var/lib/cloud/scripts/per-instance/"
+    ]
+  }
 
-provisioner "shell" {
-  inline = [
-  "cd /tmp/ebs", 
-  "sudo install -v ebs-nvme-id /usr/local/bin/", 
-  "sudo install -v -m 644 99-ebs-nvme.rules /etc/udev/rules.d/", 
-  "sudo install -v ebs-init /usr/local/bin/"
-  ]
-}
+  provisioner "shell" {
+    inline = [
+      "cd /tmp/ebs",
+      "sudo install -v ebs-nvme-id /usr/local/bin/",
+      "sudo install -v -m 644 99-ebs-nvme.rules /etc/udev/rules.d/",
+      "sudo install -v ebs-init /usr/local/bin/"
+    ]
+  }
 
-provisioner "shell" {
-  inline = [
-  "cd /tmp/docker", 
-  "chmod +x install-docker", 
-  "./install-docker --version ${var.docker_version}"
-  ]
-}
+  provisioner "shell" {
+    inline = [
+      "cd /tmp/docker",
+      "chmod +x install-docker",
+      "./install-docker --version ${var.docker_version}"
+    ]
+  }
 
-provisioner "shell" {
-  inline = [
-  "cd /tmp/consul", 
-  "chmod +x install-consul",
-  "./install-consul --version {{user `consul_version`}}"
-  ]
-}
+  provisioner "shell" {
+    inline = [
+      "cd /tmp/consul",
+      "chmod +x install-consul",
+      "./install-consul --version {{user `consul_version`}}"
+    ]
+  }
 
-provisioner "shell" {
-  inline = [
-  "cd /tmp/nomad", 
-  "chmod +x install-nomad", 
-  "./install-nomad --version ${var.nomad_version}"
-  ]
-}
+  provisioner "shell" {
+    inline = [
+      "cd /tmp/nomad",
+      "chmod +x install-nomad",
+      "./install-nomad --version ${var.nomad_version}"
+    ]
+  }
 
-provisioner "shell" {
-  inline = [
-  "echo 'Validating provisioners...'", 
-  "aws --version", "java -version", 
-  "prometheus-node-exporter --version",
-  "docker --version",
-  "consul --version",
-  "nomad --version"
-  ]
-}
+  provisioner "shell" {
+    inline = [
+      "echo 'Validating provisioners...'",
+      "aws --version", "java -version",
+      "prometheus-node-exporter --version",
+      "docker --version",
+      "consul --version",
+      "nomad --version"
+    ]
+  }
 }
