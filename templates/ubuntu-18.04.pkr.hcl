@@ -1,6 +1,7 @@
 # ---------------------------------------------------------------------------------------------------------------------
 # Added HCL format support
 # ---------------------------------------------------------------------------------------------------------------------
+
 variable "region" {
   description = "The type of EC2 Instances to run for each node in the Regional area id."
   default     = "cn-northwest-1"
@@ -61,46 +62,48 @@ variable "nomad_version" {
   type    = string
   default = "0.12.0"
 }
+
 source "amazon-ebs" "ubuntu" {
-  ami_description             = "Linux golden image based on Ubuntu 18.04"
-  ami_name                    = var.ami_name
-  ami_regions                 = var.regions_to_copy
-  associate_public_ip_address = true
-  communicator                = "ssh"
-  ssh_username                = "ubuntu"
-  iam_instance_profile        = var.iam_instance_profile
-  instance_type               = var.instance_type
-  pause_before_connecting     = "30s"
-  region                      = var.region
-  source_ami                  = var.source_ami
+  region      = var.region
+  ami_regions = var.regions_to_copy
+  source_ami  = var.source_ami
   source_ami_filter = {
     filters = {
       name                = "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-${var.os_arch}-server-*"
-      root-device-type    = "ebs"
       virtualization-type = "hvm"
+      root-device-type    = "ebs"
     }
-    most_recent = true
     owners      = var.source_ami_owner
+    most_recent = true
   }
-  ssh_clear_authorized_keys = true
-  subnet_id                 = var.subnet_id
+  ami_name                    = var.ami_name
+  ami_description             = "Linux golden image based on Ubuntu 18.04"
+  instance_type               = var.instance_type
+  iam_instance_profile        = var.iam_instance_profile
+  communicator                = "ssh"
+  pause_before_connecting     = "30s"
+  ssh_username                = "ubuntu"
+  ssh_clear_authorized_keys   = true
+  associate_public_ip_address = true
+  subnet_id                   = var.subnet_id
   tags = {
     Name                  = var.ami_name
     build_region          = "{{ .BuildRegion }}"
-    consul_version        = var.consul_version
-    docker_version        = var.docker_version
+    source_ami            = "{{ .SourceAMI }}"
+    source_ami_name       = "{{ .SourceAMIName }}"
+    os_name               = "Ubuntu"
+    os_version            = "18.04"
+    os_arch               = os_arch
+    timezone              = var.timezone
     java_distro           = "Amazon Corretto"
     java_version          = var.java_version
     node_exporter_version = var.node_exporter_version
+    docker_version        = var.docker_version
+    consul_version        = var.consul_version
     nomad_version         = var.nomad_version
-    os_arch               = os_arch
-    os_name               = "Ubuntu"
-    os_version            = "18.04"
-    source_ami            = "{{ .SourceAMI }}"
-    source_ami_name       = "{{ .SourceAMIName }}"
-    timezone              = var.timezone
   }
 }
+
 build {
   provisioner "file" {
     source      = "provisioners/shell/bash-helpers.sh"
@@ -194,6 +197,5 @@ build {
     ]
   }
   post-processor "manifest" {
-    only = ["source.amazon-ebs.ubuntu"]
   }
 }
