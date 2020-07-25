@@ -15,7 +15,7 @@
     "node_exporter_version": "1.0.1",
     "docker_version": "19.03.12",
     "consul_version": "1.8.0",
-    "nomad_version": "0.12.0"
+    "nomad_version": "0.12.1"
   },
   "builders": [{
     "type": "amazon-ebs",
