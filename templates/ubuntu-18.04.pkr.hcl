@@ -7,29 +7,26 @@ variable "region" {
   default     = "cn-northwest-1"
 }
 variable "regions_to_copy" {
-  description = "The type of EC2 Instances regions"
-  default     = "cn-north-1"
+  type    = list(string)
+  default = ["cn-north-1"]
 }
 variable "subnet_id" {
   type    = string
   default = null
 }
 variable "source_ami" {
-  type    = list(string)
-  default = []
+  type    = string
+  default = "ami-fce3c696"
 }
 variable "source_ami_owner" {
-  type    = string
-  default = "837727238323"
+  type    = list(string)
+  default = ["837727238323"]
 }
 variable "os_arch" {
   type    = string
   default = "amd64"
 }
-variable "ami_name" {
-  type    = string
-  default = "ubuntu/18.04/{{user `os_arch`}}/{{isotime \"20060102T150405Z\"}}"
-}
+
 variable "instance_type" {
   type    = string
   default = "t3.micro"
@@ -67,7 +64,7 @@ source "amazon-ebs" "ubuntu" {
   region      = var.region
   ami_regions = var.regions_to_copy
   source_ami  = var.source_ami
-  source_ami_filter = {
+  source_ami_filter {
     filters = {
       name                = "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-${var.os_arch}-server-*"
       virtualization-type = "hvm"
@@ -76,66 +73,49 @@ source "amazon-ebs" "ubuntu" {
     owners      = var.source_ami_owner
     most_recent = true
   }
-  ami_name                    = var.ami_name
+  ami_name                    = "ubuntu/18.04/${var.os_arch}/{{isotime \"20060102T150405Z\"}}"
   ami_description             = "Linux golden image based on Ubuntu 18.04"
-  instance_type               = var.instance_type
-  iam_instance_profile        = var.iam_instance_profile
+  instance_type               = "${var.instance_type}"
+  iam_instance_profile        = "${var.iam_instance_profile}"
   communicator                = "ssh"
   pause_before_connecting     = "30s"
   ssh_username                = "ubuntu"
   ssh_clear_authorized_keys   = true
   associate_public_ip_address = true
-  subnet_id                   = var.subnet_id
+  subnet_id                   = "${var.subnet_id}"
   tags = {
-    Name                  = var.ami_name
+    Name                  = "ubuntu/18.04/${var.os_arch}/{{isotime \"20060102T150405Z\"}}"
     build_region          = "{{ .BuildRegion }}"
     source_ami            = "{{ .SourceAMI }}"
     source_ami_name       = "{{ .SourceAMIName }}"
     os_name               = "Ubuntu"
     os_version            = "18.04"
-    os_arch               = os_arch
-    timezone              = var.timezone
+    os_arch               = "${var.os_arch}"
+    timezone              = "${var.timezone}"
     java_distro           = "Amazon Corretto"
-    java_version          = var.java_version
-    node_exporter_version = var.node_exporter_version
-    docker_version        = var.docker_version
-    consul_version        = var.consul_version
-    nomad_version         = var.nomad_version
+    java_version          = "${var.java_version}"
+    node_exporter_version = "${var.node_exporter_version}"
+    docker_version        = "${var.docker_version}"
+    consul_version        = "${var.consul_version}"
+    nomad_version         = "${var.nomad_version}"
   }
 }
 
 build {
+  sources = ["sources.amazon-ebs.ubuntu"]
+
   provisioner "file" {
     source      = "provisioners/shell/bash-helpers.sh"
     destination = "/tmp/"
   }
-  provisioner "file" {
-    source      = "provisioners/shell/cloud-init/mount-nvme-instance-store"
-    destination = "/tmp/"
-  }
-  provisioner "file" {
-    source      = "provisioners/shell/ebs"
-    destination = "/tmp/"
-  }
-  provisioner "file" {
-    source      = "provisioners/shell/docker"
-    destination = "/tmp/"
-  }
-  provisioner "file" {
-    source      = "provisioners/shell/consul"
-    destination = "/tmp/"
-  }
-  provisioner "file" {
-    source      = "provisioners/shell/nomad"
-    destination = "/tmp/"
-  }
+
   provisioner "shell" {
-    environment_vars = {
-      "BASH_HELPERS"          = "/tmp/bash-helpers.sh"
-      "TIMEZONE"              = "{var.timezone}"
-      "JAVA_VERSION"          = "{var.java_version}"
-      "NODE_EXPORTER_VERSION" = "{var.node_exporter_version}"
-    }
+    environment_vars = [
+      "BASH_HELPERS         = /tmp/bash-helpers.sh",
+      "TIMEZONE             = ${var.timezone}",
+      "JAVA_VERSION         = ${var.java_version}",
+      "NODE_EXPORTER_VERSION = ${var.node_exporter_version}"
+    ]
     scripts = [
       "provisioners/shell/apt-mirrors.sh",
       "provisioners/shell/apt-upgrade.sh",
@@ -151,12 +131,24 @@ build {
       "provisioners/shell/prometheus/node-exporter.sh"
     ]
   }
+
+  provisioner "file" {
+    source      = "provisioners/shell/cloud-init/mount-nvme-instance-store"
+    destination = "/tmp/"
+  }
+
   provisioner "shell" {
     inline = [
       "cd /tmp/",
       "sudo install -v mount-nvme-instance-store /var/lib/cloud/scripts/per-instance/"
     ]
   }
+
+  provisioner "file" {
+    source      = "provisioners/shell/ebs"
+    destination = "/tmp/"
+  }
+
   provisioner "shell" {
     inline = [
       "cd /tmp/ebs",
@@ -165,6 +157,12 @@ build {
       "sudo install -v ebs-init /usr/local/bin/"
     ]
   }
+
+  provisioner "file" {
+    source      = "provisioners/shell/docker"
+    destination = "/tmp/"
+  }
+
   provisioner "shell" {
     inline = [
       "cd /tmp/docker",
@@ -172,13 +170,25 @@ build {
       "./install-docker --version ${var.docker_version}"
     ]
   }
+
+  provisioner "file" {
+    source      = "provisioners/shell/consul"
+    destination = "/tmp/"
+  }
+
   provisioner "shell" {
     inline = [
       "cd /tmp/consul",
       "chmod +x install-consul",
-      "./install-consul --version {{user `consul_version`}}"
+      "./install-consul --version ${var.consul_version}"
     ]
   }
+
+  provisioner "file" {
+    source      = "provisioners/shell/nomad"
+    destination = "/tmp/"
+  }
+
   provisioner "shell" {
     inline = [
       "cd /tmp/nomad",
@@ -186,6 +196,7 @@ build {
       "./install-nomad --version ${var.nomad_version}"
     ]
   }
+
   provisioner "shell" {
     inline = [
       "echo 'Validating provisioners...'",
@@ -196,6 +207,7 @@ build {
       "nomad --version"
     ]
   }
+
   post-processor "manifest" {
   }
 }
