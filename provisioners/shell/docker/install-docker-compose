@@ -1,0 +1,110 @@
+#!/bin/bash
+
+# See
+# https://docs.docker.com/compose/install/
+
+set -e
+
+# =============================================================================
+
+readonly TMP_DIR=$(mktemp --tmpdir=/tmp --directory docker-compose-XXXXXXXX)
+
+readonly SYSTEM_BIN_DIR="/usr/local/bin"
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly SCRIPT_NAME="$(basename "$0")"
+
+# =============================================================================
+
+function print_usage {
+  echo
+  echo "Usage: install-docker-compose [OPTIONS]"
+  echo
+  echo "This script can be used to install Docker Compose on AWS EC2."
+  echo
+  echo "Options:"
+  echo
+  echo -e "  --version\tThe version of Docker Compose to install."
+  echo
+  echo "Example:"
+  echo
+  echo "  install-docker-compose --version 1.27.3"
+}
+
+function log {
+  local readonly level="$1"
+  local readonly message="$2"
+  local readonly timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+  >&2 echo -e "${timestamp} [${level}] [$SCRIPT_NAME] ${message}"
+}
+
+function log_info {
+  local readonly message="$1"
+  log "INFO" "$message"
+}
+
+function log_error {
+  local readonly message="$1"
+  log "ERROR" "$message"
+}
+
+function assert_not_empty {
+  local readonly arg_name="$1"
+  local readonly arg_value="$2"
+
+  if [[ -z "$arg_value" ]]; then
+    log_error "The value for '$arg_name' cannot be empty"
+    print_usage
+    exit 1
+  fi
+}
+
+# =============================================================================
+
+function install_docker_compose {
+  local readonly version="$1"
+
+  local readonly download_url="https://github.com/docker/compose/releases/download/$version/docker-compose-$(uname -s)-$(uname -m)"
+  local readonly tmp_file="/$TMP_DIR/docker-compose"
+
+  curl -s -L "$download_url" -o "$tmp_file"
+  sudo install "$tmp_file" "$SYSTEM_BIN_DIR"
+}
+
+# =============================================================================
+
+function install {
+  local version=""
+
+  while [[ $# > 0 ]]; do
+    local key="$1"
+
+    case "$key" in
+      --version)
+        version="$2"
+        shift
+        ;;
+      --help)
+        print_usage
+        exit
+        ;;
+      *)
+        log_error "Unrecognized argument: $key"
+        print_usage
+        exit 1
+        ;;
+    esac
+
+    shift
+  done
+
+  assert_not_empty "--version" "$version"
+
+  log_info "Start installing docker-compose $version"
+
+  install_docker_compose "$version"
+
+  log_info "Docker Compose $version install complete!"
+}
+
+install "$@"

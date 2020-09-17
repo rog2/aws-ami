@@ -14,6 +14,7 @@
     "java_version": "11.0.8.10-1",
     "node_exporter_version": "1.0.1",
     "docker_version": "19.03.12",
+    "docker_compose_version": "1.27.3",
     "consul_version": "1.8.4",
     "nomad_version": "0.12.4"
   },
@@ -54,6 +55,7 @@
       "java_version": "{{user `java_version`}}",
       "node_exporter_version": "{{user `node_exporter_version`}}",
       "docker_version": "{{user `docker_version`}}",
+      "docker_compose_version": "{{user `docker_compose_version`}}",
       "consul_version": "{{user `consul_version`}}",
       "nomad_version": "{{user `nomad_version`}}"
     }
@@ -123,7 +125,8 @@
     "inline": [
       "cd /tmp/docker",
       "chmod +x install-docker",
-      "./install-docker --version {{user `docker_version`}}"
+      "./install-docker --version {{user `docker_version`}}",
+      "./install-docker-compose --version {{user `docker_compose_version`}}"
     ]
   },
   {
@@ -160,6 +163,7 @@
       "java -version",
       "prometheus-node-exporter --version",
       "docker --version",
+      "docker-compose --version",
       "consul --version",
       "nomad --version"
     ]
