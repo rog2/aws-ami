@@ -16,7 +16,7 @@
     "docker_version": "19.03.13",
     "docker_compose_version": "1.27.3",
     "consul_version": "1.8.4",
-    "nomad_version": "0.12.4"
+    "nomad_version": "0.12.5"
   },
   "builders": [{
     "type": "amazon-ebs",
