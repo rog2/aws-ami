@@ -126,7 +126,7 @@
     "type": "shell",
     "inline": [
       "cd /tmp/docker",
-      "chmod +x install-docker",
+      "chmod +x install-docker install-docker-compose install-ecr-helper",
       "./install-docker --version {{user `docker_version`}}",
       "./install-docker-compose --version {{user `docker_compose_version`}}",
       "./install-ecr-helper --version {{user `ecr_helper_version`}}"
