@@ -169,7 +169,6 @@ EOF
   if [[ "$client" == "true" ]]; then
     local meta_block=$("$nomad_helper" meta --indent 2 "$meta")
     local host_volumes_stanzas=$("$nomad_helper" host-volumes --indent 2 "$host_volumes")
-    if
     client_config=$(cat <<EOF
 client {
   enabled = true
