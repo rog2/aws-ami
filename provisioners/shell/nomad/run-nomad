@@ -165,11 +165,11 @@ EOF
   fi
 
   local client_config=""
-  local meta_block=""
   local nomad_helper="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"/nomad-helper
   if [[ "$client" == "true" ]]; then
-    meta_block=$("$nomad_helper" meta --indent 2 "$meta")
-    host_volumes_stanzas=$("$nomad_helper" host-volumes --indent 2 "$host_volumes")
+    local meta_block=$("$nomad_helper" meta --indent 2 "$meta")
+    local host_volumes_stanzas=$("$nomad_helper" host-volumes --indent 2 "$host_volumes")
+    if
     client_config=$(cat <<EOF
 client {
   enabled = true
@@ -199,6 +199,9 @@ plugin "raw_exec" {
 
 plugin "docker" {
   config {
+    auth {
+      helper = "ecr-login"
+    }
     gc {
       image       = true
       image_delay = "1h"
