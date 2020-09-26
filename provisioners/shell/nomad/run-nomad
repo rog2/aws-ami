@@ -15,6 +15,8 @@ readonly NOMAD_USER="nomad"
 readonly NOMAD_INSTALL_PATH="/opt/nomad"
 readonly NOMAD_CONFIG_FILE="default.hcl"
 
+readonly DOCKER_AUTH_CONFIG_FILE="/etc/docker-auth.json"
+
 readonly EC2_INSTANCE_METADATA_URL="http://169.254.169.254/latest/meta-data"
 readonly EC2_INSTANCE_DYNAMIC_DATA_URL="http://169.254.169.254/latest/dynamic"
 
@@ -103,6 +105,19 @@ function get_instance_region {
   lookup_path_in_instance_dynamic_data "instance-identity/document" | jq -r ".region"
 }
 
+function get_aws_account_id {
+  lookup_path_in_instance_dynamic_data "instance-identity/document" | jq -r ".accountId"
+}
+
+function get_aws_domain_name {
+  local readonly region="$1"
+  if [[ $region == cn-* ]]; then
+    echo "amazonaws.com.cn"
+  else
+    echo "amazonaws.com"
+  fi
+}
+
 function assert_is_installed {
   local readonly name="$1"
 
@@ -128,6 +143,23 @@ function prepare_nomad_data_dir {
     log_info "Nomad will use data_dir: $ebs_data_dir"
     echo "$ebs_data_dir"
   fi
+}
+
+function generate_docker_auth_config {
+  local readonly region="$1"
+  local readonly config_path="$2"
+
+  local readonly account=$(get_aws_account_id)
+  local readonly domain=$(get_aws_domain_name "$region")
+
+  local readonly ecr_endpoint="$account.dkr.ecr.$region.$domain"
+  cat > "$config_path" <<EOF
+{
+  "credHelpers": {
+    "$ecr_endpoint": "ecr-login"
+  }
+}
+EOF
 }
 
 function generate_nomad_config {
@@ -167,6 +199,10 @@ EOF
   local client_config=""
   local nomad_helper="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"/nomad-helper
   if [[ "$client" == "true" ]]; then
+    local readonly docker_auth_config_path="$DOCKER_AUTH_CONFIG_FILE"
+    log_info "Creating docker auth config file at $docker_auth_config_path"
+    generate_docker_auth_config "$instance_region" "$docker_auth_config_path"
+
     local meta_block=$("$nomad_helper" meta --indent 2 "$meta")
     local host_volumes_stanzas=$("$nomad_helper" host-volumes --indent 2 "$host_volumes")
     client_config=$(cat <<EOF
@@ -199,7 +235,7 @@ plugin "raw_exec" {
 plugin "docker" {
   config {
     auth {
-      helper = "ecr-login"
+      config = "$docker_auth_config_path"
     }
     gc {
       image       = true
