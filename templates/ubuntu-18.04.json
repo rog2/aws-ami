@@ -124,6 +124,9 @@
   },
   {
     "type": "shell",
+    "environment_vars": [
+      "BASH_HELPERS=/tmp/bash-helpers.sh"
+    ],
     "inline": [
       "cd /tmp/docker",
       "chmod +x install-docker install-docker-compose install-ecr-helper",

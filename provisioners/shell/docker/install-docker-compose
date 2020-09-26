@@ -5,6 +5,8 @@
 
 set -e
 
+source "$BASH_HELPERS"
+
 # =============================================================================
 
 readonly TMP_DIR=$(mktemp --tmpdir=/tmp --directory docker-compose-XXXXXXXX)
@@ -31,44 +33,16 @@ function print_usage {
   echo "  install-docker-compose --version 1.27.3"
 }
 
-function log {
-  local readonly level="$1"
-  local readonly message="$2"
-  local readonly timestamp=$(date +"%Y-%m-%d %H:%M:%S")
-  >&2 echo -e "${timestamp} [${level}] [$SCRIPT_NAME] ${message}"
-}
-
-function log_info {
-  local readonly message="$1"
-  log "INFO" "$message"
-}
-
-function log_error {
-  local readonly message="$1"
-  log "ERROR" "$message"
-}
-
-function assert_not_empty {
-  local readonly arg_name="$1"
-  local readonly arg_value="$2"
-
-  if [[ -z "$arg_value" ]]; then
-    log_error "The value for '$arg_name' cannot be empty"
-    print_usage
-    exit 1
-  fi
-}
-
 # =============================================================================
 
 function install_docker_compose {
   local readonly version="$1"
 
   local readonly download_url="https://github.com/docker/compose/releases/download/$version/docker-compose-$(uname -s)-$(uname -m)"
-  local readonly tmp_file="/$TMP_DIR/docker-compose"
+  local readonly download_path="$TMP_DIR/docker-compose"
 
-  curl -s -L "$download_url" -o "$tmp_file"
-  sudo install "$tmp_file" "$SYSTEM_BIN_DIR"
+  http_download "$download_url" "$download_path"
+  sudo install "$download_path" "$SYSTEM_BIN_DIR"
 }
 
 # =============================================================================
