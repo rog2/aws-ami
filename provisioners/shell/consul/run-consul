@@ -258,6 +258,7 @@ EOF
   log_info "Creating default Consul configuration"
   local default_config_json=$(cat <<EOF
 {
+  "disable_update_check": true,
   "server": $server,
   "data_dir": "$data_dir",
   "advertise_addr": "$instance_ip_address",
