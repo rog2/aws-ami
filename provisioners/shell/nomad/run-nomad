@@ -250,6 +250,8 @@ EOF
 
   log_info "Creating default Nomad config file in $config_path"
   cat > "$config_path" <<EOF
+disable_update_check = true
+
 data_dir   = "$data_dir"
 region     = "$instance_region"
 datacenter = "$availability_zone"
