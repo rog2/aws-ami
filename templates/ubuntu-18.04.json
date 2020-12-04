@@ -16,7 +16,7 @@
     "docker_version": "19.03.14",
     "docker_compose_version": "1.27.4",
     "ecr_helper_version": "0.4.0",
-    "consul_version": "1.8.4",
+    "consul_version": "1.9.0",
     "nomad_version": "1.0.0-beta3"
   },
   "builders": [{
