@@ -242,6 +242,9 @@ plugin "docker" {
       image_delay = "1h"
       container   = true
     }
+    volumes {
+      enabled = true
+    }
   }
 }
 EOF
