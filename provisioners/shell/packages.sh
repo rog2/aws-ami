@@ -7,7 +7,6 @@ sudo apt-get update
 # Common packages across all versions
 DEPS="
   linux-tools-aws
-  apt-show-versions
   nvme-cli
   zip
   unzip
@@ -18,9 +17,7 @@ DEPS="
   coreutils
   tree
   jq
-  aria2
   gdb
-  ruby2.5
   python3-pip
   python3-boto
   python3-boto3
@@ -36,7 +33,7 @@ for dep in $DEPS; do
   fi
 done
 
-# Uninstall amazon-ssm-agent, which comes with Ubuntu 18.04 AMI via snap.
+# Uninstall amazon-ssm-agent, which comes with Ubuntu AMI via snap.
 sudo snap remove amazon-ssm-agent
 
 # Uninstall snapd, which is not used by us.
