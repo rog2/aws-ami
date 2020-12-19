@@ -1,0 +1,183 @@
+{
+  "description": "Linux golden image based on Ubuntu 20.04",
+  "variables": {
+    "region": "cn-northwest-1",
+    "regions_to_copy": "cn-north-1",
+    "subnet_id": "",
+    "source_ami": "",
+    "source_ami_owner": "837727238323",
+    "os_arch": "amd64",
+    "ami_name": "ubuntu/20.04/{{user `os_arch`}}/{{isotime \"20060102T150405Z\"}}",
+    "instance_type": "t3.micro",
+    "iam_instance_profile": "packer-ec2",
+    "timezone": "Asia/Shanghai",
+    "java_version": "11.0.9.11-1",
+    "node_exporter_version": "1.0.1",
+    "docker_version": "20.10.1",
+    "docker_compose_version": "1.27.4",
+    "ecr_helper_version": "0.4.0",
+    "consul_version": "1.9.1",
+    "nomad_version": "1.0.1"
+  },
+  "builders": [{
+    "type": "amazon-ebs",
+    "region": "{{user `region`}}",
+    "ami_regions": "{{user `regions_to_copy`}}",
+    "source_ami": "{{user `source_ami`}}",
+    "source_ami_filter": {
+      "filters": {
+        "name": "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-{{user `os_arch`}}-server-*",
+        "virtualization-type": "hvm",
+        "root-device-type": "ebs"
+      },
+      "owners": "{{user `source_ami_owner`}}",
+      "most_recent": true
+    },
+    "ami_name": "{{user `ami_name`}}",
+    "ami_description": "Linux golden image based on Ubuntu 20.04",
+    "instance_type": "{{user `instance_type`}}",
+    "iam_instance_profile": "{{user `iam_instance_profile`}}",
+    "communicator": "ssh",
+    "pause_before_connecting": "30s",
+    "ssh_username": "ubuntu",
+    "ssh_clear_authorized_keys": true,
+    "associate_public_ip_address": true,
+    "subnet_id": "{{user `subnet_id`}}",
+    "tags": {
+      "Name": "{{user `ami_name`}}",
+      "build_region": "{{ .BuildRegion }}",
+      "source_ami": "{{ .SourceAMI }}",
+      "source_ami_name": "{{ .SourceAMIName }}",
+      "os_name": "Ubuntu",
+      "os_version": "20.04",
+      "os_arch": "{{user `os_arch`}}",
+      "timezone": "{{user `timezone`}}",
+      "java_distro": "Amazon Corretto",
+      "java_version": "{{user `java_version`}}",
+      "node_exporter_version": "{{user `node_exporter_version`}}",
+      "docker_version": "{{user `docker_version`}}",
+      "docker_compose_version": "{{user `docker_compose_version`}}",
+      "ecr_helper_version": "{{user `ecr_helper_version`}}",
+      "consul_version": "{{user `consul_version`}}",
+      "nomad_version": "{{user `nomad_version`}}"
+    }
+  }],
+  "provisioners": [
+  {
+    "type": "file",
+    "source": "provisioners/shell/bash-helpers.sh",
+    "destination": "/tmp/"
+  },
+  {
+    "type": "shell",
+    "environment_vars": [
+      "BASH_HELPERS=/tmp/bash-helpers.sh",
+      "TIMEZONE={{user `timezone`}}",
+      "JAVA_VERSION={{user `java_version`}}",
+      "NODE_EXPORTER_VERSION={{user `node_exporter_version`}}"
+    ],
+    "scripts": [
+      "provisioners/shell/apt-mirrors.sh",
+      "provisioners/shell/apt-upgrade.sh",
+      "provisioners/shell/apt-daily-conf.sh",
+      "provisioners/shell/packages.sh",
+      "provisioners/shell/journald-conf.sh",
+      "provisioners/shell/core-pattern.sh",
+      "provisioners/shell/kernel-tuning.sh",
+      "provisioners/shell/chrony.sh",
+      "provisioners/shell/timezone.sh",
+      "provisioners/shell/awscliv2.sh",
+      "provisioners/shell/java-amazon-corretto.sh",
+      "provisioners/shell/prometheus/node-exporter.sh"
+    ]
+  },
+  {
+    "type": "file",
+    "source": "provisioners/shell/cloud-init/mount-nvme-instance-store",
+    "destination": "/tmp/"
+  },
+  {
+    "type": "shell",
+    "inline": [
+      "cd /tmp/",
+      "sudo install -v mount-nvme-instance-store /var/lib/cloud/scripts/per-instance/"
+    ]
+  },
+  {
+    "type": "file",
+    "source": "provisioners/shell/ebs",
+    "destination": "/tmp/"
+  },
+  {
+    "type": "shell",
+    "inline": [
+      "cd /tmp/ebs",
+      "sudo install -v ebs-nvme-id /usr/local/bin/",
+      "sudo install -v -m 644 99-ebs-nvme.rules /etc/udev/rules.d/",
+      "sudo install -v ebs-init /usr/local/bin/"
+    ]
+  },
+  {
+    "type": "file",
+    "source": "provisioners/shell/docker",
+    "destination": "/tmp/"
+  },
+  {
+    "type": "shell",
+    "environment_vars": [
+      "BASH_HELPERS=/tmp/bash-helpers.sh"
+    ],
+    "inline": [
+      "cd /tmp/docker",
+      "chmod +x install-docker install-docker-compose install-ecr-helper",
+      "./install-docker --version {{user `docker_version`}}",
+      "./install-docker-compose --version {{user `docker_compose_version`}}",
+      "./install-ecr-helper --version {{user `ecr_helper_version`}}"
+    ]
+  },
+  {
+    "type": "file",
+    "source": "provisioners/shell/consul",
+    "destination": "/tmp/"
+  },
+  {
+    "type": "shell",
+    "inline": [
+      "cd /tmp/consul",
+      "chmod +x install-consul",
+      "./install-consul --version {{user `consul_version`}}"
+    ]
+  },
+  {
+    "type": "file",
+    "source": "provisioners/shell/nomad",
+    "destination": "/tmp/"
+  },
+  {
+    "type": "shell",
+    "inline": [
+      "cd /tmp/nomad",
+      "chmod +x install-nomad",
+      "./install-nomad --version {{user `nomad_version`}}"
+    ]
+  },
+  {
+    "type": "shell",
+    "inline": [
+      "echo 'Validating provisioners...'",
+      "aws --version",
+      "java -version",
+      "prometheus-node-exporter --version",
+      "docker --version",
+      "docker-compose --version",
+      "docker-credential-ecr-login -v",
+      "consul --version",
+      "nomad --version"
+    ]
+  }],
+  "post-processors": [
+    {
+      "type": "manifest"
+    }
+  ]
+}
