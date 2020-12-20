@@ -27,9 +27,7 @@ DEPS="
 for dep in $DEPS; do
   if [[ "! dpkg -s $dep > /dev/null 2>&1" ]]; then
     echo "Attempting installation of missing package: $dep"
-    set -x
     sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q $dep
-    set +x
   fi
 done
 

@@ -1,4 +1,6 @@
-#!/bin/bash -ex
+#!/bin/bash
+
+set -e
 
 # conf_path=/etc/systemd/system/apt-daily.timer.d
 # conf_file=$conf_path/boot.conf

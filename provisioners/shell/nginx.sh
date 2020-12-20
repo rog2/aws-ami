@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ex
+set -e
 
 # Installs Nginx package with instructions in:
 # https://nginx.org/en/linux_packages.html
