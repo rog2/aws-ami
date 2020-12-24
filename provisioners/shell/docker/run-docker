@@ -5,6 +5,7 @@ set -e
 # =============================================================================
 
 readonly DOCKER_CONFIG_PATH="/etc/docker/daemon.json"
+readonly DOCKER_DEFAULT_DATA_ROOT="/var/lib/docker"
 
 # cloud-init/mount-nvme-instance-store
 readonly INSTANCE_STORE="/mnt/ephemeral"
@@ -16,18 +17,24 @@ function get_docker_data_root {
   if [[ -d "$INSTANCE_STORE" ]]; then
     echo "$INSTANCE_STORE/docker"
   else
-    echo "/var/lib/docker"
+    echo "$DOCKER_DEFAULT_DATA_ROOT"
+  fi
+}
+
+function prepare_docker_data_root {
+  local readonly data_root=$(get_docker_data_root)
+  if [[ "$data_root" != "$DOCKER_DEFAULT_DATA_ROOT" ]]; then
+    >&2 echo -e "Symlink $DOCKER_DEFAULT_DATA_ROOT -> $data_root"
+    mkdir -p "$data_root"
+    ln -s "$data_root" "$DOCKER_DEFAULT_DATA_ROOT"
   fi
 }
 
 # https://docs.docker.com/config/daemon/systemd/
 # https://docs.docker.com/engine/reference/commandline/dockerd/#daemon-configuration-file
 function generate_docker_config {
-  local readonly data_root=$(get_docker_data_root)
-
   cat > "$DOCKER_CONFIG_PATH" <<EOF
 {
-  "data-root": "$data_root"
 }
 EOF
 }
@@ -40,6 +47,7 @@ function start_docker {
 }
 
 function run {
+  prepare_docker_data_root
   generate_docker_config
   start_docker
 }
