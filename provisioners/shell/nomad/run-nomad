@@ -36,6 +36,7 @@ function print_usage {
   echo -e "  --server\t\tIf set, run in server mode. Optional. At least one of --server or --client must be set."
   echo -e "  --client\t\tIf set, run in client mode. Optional. At least one of --server or --client must be set."
   echo -e "  --num-servers\t\tThe number of servers to expect in the Nomad cluster. Required if --server is true."
+  echo -e "  --scheduler-algorithm\tThe default algorithm to schedule jobs. Optional if --server is true. Can be \"binpack\" or \"spread\". Defaults to \"binpack\"."
   echo -e "  --node-class\t\tThe node_class of nomad client. Optional if --client is true."
   echo -e "  --meta\t\tThe meta of nomad client. Optional if --client is true. Provide key=value,key=value... format string."
   echo -e "  --host-volumes\tHost volumes to be made available to jobs. Optional if --client is true. Format is name:path:owner:group:read_only,..."
@@ -166,12 +167,13 @@ function generate_nomad_config {
   local readonly server="$1"
   local readonly client="$2"
   local readonly num_servers="$3"
-  local readonly node_class="$4"
-  local readonly config_dir="$5"
-  local readonly data_dir="$6"
-  local readonly user="$7"
-  local readonly meta="$8"
-  local readonly host_volumes="$9"
+  local readonly scheduler_algorithm="$4"
+  local readonly node_class="$5"
+  local readonly config_dir="$6"
+  local readonly data_dir="$7"
+  local readonly user="$8"
+  local readonly meta="$9"
+  local readonly host_volumes="${10}"
   local readonly config_path="$config_dir/$NOMAD_CONFIG_FILE"
 
   local instance_id=""
@@ -191,6 +193,14 @@ server {
   enabled = true
   raft_protocol = 3
   bootstrap_expect = $num_servers
+  default_scheduler_config {
+    scheduler_algorithm = "$scheduler_algorithm"
+    preemption_config {
+      system_scheduler_enabled  = true
+      batch_scheduler_enabled   = false
+      service_scheduler_enabled = false
+    }
+  }
 }
 EOF
 )
@@ -336,6 +346,7 @@ function run {
   local server="false"
   local client="false"
   local num_servers=""
+  local scheduler_algorithm="binpack"
   local node_class=""
   local user=""
   local meta=""
@@ -356,6 +367,10 @@ function run {
         ;;
       --num-servers)
         num_servers="$2"
+        shift
+        ;;
+      --scheduler-algorithm)
+        scheduler_algorithm="$2"
         shift
         ;;
       --node-class)
@@ -407,7 +422,7 @@ function run {
 
   local readonly data_dir=$(prepare_nomad_data_dir "$user")
 
-  generate_nomad_config "$server" "$client" "$num_servers" "$node_class" "$config_dir" "$data_dir" "$user" "$meta" "$host_volumes"
+  generate_nomad_config "$server" "$client" "$num_servers" "$scheduler_algorithm" "$node_class" "$config_dir" "$data_dir" "$user" "$meta" "$host_volumes"
   generate_systemd_config "$user" "$bin_dir" "$config_dir"
 
   start_nomad
