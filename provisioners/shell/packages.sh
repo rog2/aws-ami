@@ -7,6 +7,7 @@ sudo apt-get update
 # Common packages across all versions
 DEPS="
   linux-tools-aws
+  ssl-cert
   nvme-cli
   zip
   unzip
