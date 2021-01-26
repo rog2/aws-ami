@@ -14,6 +14,5 @@ Configure the **EC2 Instance Profile** if you are running packer on EC2. Otherwi
 packer build \
     -var 'region=[region]' \
     -var 'subnet_id=[subnet_id]' \
-    -var 'source_ami=[source_ami]' \
-    templates/[name].json
+    templates/[name]
 ```
