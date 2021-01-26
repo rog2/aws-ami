@@ -23,9 +23,9 @@ deb http://mirrors.aliyun.com/ubuntu/ ${codename}-updates universe
 deb http://mirrors.aliyun.com/ubuntu/ ${codename} multiverse
 deb http://mirrors.aliyun.com/ubuntu/ ${codename}-updates multiverse
 deb http://mirrors.aliyun.com/ubuntu/ ${codename}-backports main restricted universe multiverse
-deb http://security.ubuntu.com/ubuntu ${codename}-security main restricted
-deb http://security.ubuntu.com/ubuntu ${codename}-security universe
-deb http://security.ubuntu.com/ubuntu ${codename}-security multiverse
+deb http://mirrors.aliyun.com/ubuntu/ ${codename}-security main restricted
+deb http://mirrors.aliyun.com/ubuntu/ ${codename}-security universe
+deb http://mirrors.aliyun.com/ubuntu/ ${codename}-security multiverse
 EOF
 }
 
