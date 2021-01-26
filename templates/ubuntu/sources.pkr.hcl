@@ -11,6 +11,7 @@ source "amazon-ebs" "bionic-amd64" {
 
   region          = var.region
   ami_regions     = var.regions_to_copy
+  ami_users       = var.users_to_share
   ami_description = "Linux golden image based on Ubuntu 18.04 (amd64)"
   ami_name        = local.ami_names.bionic_amd64
 

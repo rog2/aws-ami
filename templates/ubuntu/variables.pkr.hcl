@@ -42,6 +42,12 @@ variable "regions_to_copy" {
   default     = []
 }
 
+variable "users_to_share" {
+  description = "A list of AWS account IDs to share AMI with."
+  type        = list(string)
+  default     = []
+}
+
 variable "timezone" {
   description = "The system time zone the AMI is configured with."
   type        = string
