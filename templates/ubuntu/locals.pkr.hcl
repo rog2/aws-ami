@@ -17,5 +17,6 @@ locals {
   # AMI names for OS releases/architectures
   ami_names = {
     bionic_amd64 = "ubuntu/18.04/amd64/${local.timestamp}"
+    focal_amd64  = "ubuntu/20.04/amd64/${local.timestamp}"
   }
 }

@@ -3,6 +3,7 @@ build {
 
   sources = [
     "source.amazon-ebs.bionic-amd64",
+    "source.amazon-ebs.focal-amd64",
   ]
 
   provisioner "file" {
