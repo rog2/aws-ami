@@ -260,6 +260,7 @@ EOF
   local default_config_json=$(cat <<EOF
 {
   "disable_update_check": true,
+  "leave_on_terminate": true,
   "server": $server,
   "data_dir": "$data_dir",
   "advertise_addr": "$instance_ip_address",

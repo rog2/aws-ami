@@ -192,6 +192,7 @@ Group=$username
 ExecStart=$consul_binary_path agent -config-dir=$config_dir
 ExecReload=$consul_binary_path reload
 KillMode=process
+KillSignal=SIGTERM
 Restart=on-failure
 LimitNOFILE=65536
 
