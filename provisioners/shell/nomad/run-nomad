@@ -265,6 +265,8 @@ EOF
   cat > "$config_path" <<EOF
 disable_update_check = true
 
+leave_on_terminate = true
+
 data_dir   = "$data_dir"
 region     = "$instance_region"
 datacenter = "$availability_zone"
@@ -321,7 +323,7 @@ StartLimitIntervalSec=10
 User=$username
 Group=$username
 KillMode=process
-KillSignal=SIGINT
+KillSignal=SIGTERM
 ExecStart=$nomad_binary_path agent -config=$config_dir
 ExecReload=/bin/kill -HUP \$MAINPID
 Restart=on-failure
