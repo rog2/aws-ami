@@ -7,6 +7,7 @@ sudo apt-get update
 # Common packages across all versions
 DEPS="
   linux-tools-aws
+  net-tools
   ssl-cert
   nvme-cli
   zip
@@ -37,3 +38,8 @@ sudo snap remove amazon-ssm-agent
 
 # Uninstall snapd, which is not used by us.
 sudo apt-get purge -y snapd
+
+# Uninstall ec2-instance-connect, which is not used by us.
+# This resolves ec2-instance-connect.service failure during boot,
+# which causes "systemctl status" in "degraded" state.
+sudo apt-get purge -y --auto-remove ec2-instance-connect
