@@ -27,7 +27,7 @@ DEPS="
 
 # Install basic packages
 for dep in $DEPS; do
-  if [[ "! dpkg -s $dep > /dev/null 2>&1" ]]; then
+  if ! dpkg -s $dep > /dev/null 2>&1; then
     echo "Attempting installation of missing package: $dep"
     sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q $dep
   fi
