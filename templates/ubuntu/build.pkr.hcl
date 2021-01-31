@@ -71,10 +71,25 @@ build {
     ]
     inline = [
       "cd /tmp/docker",
-      "chmod +x install-docker install-docker-compose install-ecr-helper",
+      "chmod +x install-docker install-ecr-helper",
       "./install-docker --version ${local.docker_version}",
-      "./install-docker-compose --version ${local.docker_compose_version}",
       "./install-ecr-helper --version ${local.ecr_helper_version}",
+    ]
+  }
+
+  provisioner "shell" {
+    # docker-compose only supports amd64
+    only = [
+      "source.amazon-ebs.bionic-amd64",
+      "source.amazon-ebs.focal-amd64",
+    ]
+    environment_vars = [
+      "BASH_HELPERS=/tmp/bash-helpers.sh",
+    ]
+    inline = [
+      "cd /tmp/docker",
+      "chmod +x install-docker-compose",
+      "./install-docker-compose --version ${local.docker_compose_version}",
     ]
   }
 
