@@ -2,7 +2,8 @@
 
 set -e
 
-readonly DOWNLOAD_URL="https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+# https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux.html
+readonly DOWNLOAD_URL="https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip"
 readonly LOCAL_PATH="/tmp/awscliv2.zip"
 
 # https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux.html
