@@ -10,7 +10,7 @@ if [[ $az == cn-* ]]; then
   mkdir -p ~/.pip
   tee ~/.pip/pip.conf << EOF
 [global]
-index-url = https://pypi.tuna.tsinghua.edu.cn/simple
+index-url = https://mirrors.aliyun.com/pypi/simple/
 EOF
 fi
 
