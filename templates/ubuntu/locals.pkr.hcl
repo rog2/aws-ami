@@ -8,7 +8,7 @@ locals {
   docker_version         = "20.10.2"
   docker_compose_version = "1.28.2"
   ecr_helper_version     = "0.4.0"
-  consul_version         = "1.9.2"
+  consul_version         = "1.9.3"
   nomad_version          = "1.0.2"
 
   # Canonical's official China/Global AWS account IDs
