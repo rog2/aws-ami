@@ -4,6 +4,7 @@ build {
   sources = [
     "source.amazon-ebs.bionic-amd64",
     "source.amazon-ebs.focal-amd64",
+    "source.amazon-ebs.focal-arm64",
   ]
 
   provisioner "file" {
@@ -90,6 +91,7 @@ build {
       "cd /tmp/docker",
       "chmod +x install-docker-compose",
       "./install-docker-compose --version ${local.docker_compose_version}",
+      "docker-compose --version",
     ]
   }
 
@@ -126,7 +128,6 @@ build {
       "java -version",
       "prometheus-node-exporter --version",
       "docker --version",
-      "docker-compose --version",
       "docker-credential-ecr-login -v",
       "consul --version",
       "nomad --version",
