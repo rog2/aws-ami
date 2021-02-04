@@ -1,0 +1,206 @@
+#!/bin/bash
+
+#
+# Configure and run Nginx on an AWS EC2.
+# This script is expected to be run as "root" via EC2 User Data.
+#
+
+set -e
+
+# =============================================================================
+
+readonly NGINX_CONF_FILE="/etc/nginx/nginx.conf"
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly SCRIPT_NAME="$(basename "$0")"
+
+# =============================================================================
+
+function print_usage {
+  echo
+  echo "Usage: run-nginx [OPTIONS]"
+  echo
+  echo "Configure and run Nginx on an AWS EC2."
+  echo
+  echo "Options:"
+  echo
+  echo -e "  --upstream\Render nginx config for the upstream server. Currently only \"nomad\" is supported."
+  echo -e "  --server-name\tThe server_name in nginx server block."
+  echo
+  echo "Example:"
+  echo
+  echo "  run-nginx --upstream nomad --server-name nomad.example.com"
+}
+
+function log {
+  local readonly level="$1"
+  local readonly message="$2"
+  local readonly timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+  >&2 echo -e "${timestamp} [${level}] [$SCRIPT_NAME] ${message}"
+}
+
+function log_info {
+  local readonly message="$1"
+  log "INFO" "$message"
+}
+
+function log_error {
+  local readonly message="$1"
+  log "ERROR" "$message"
+}
+
+function assert_not_empty {
+  local readonly arg_name="$1"
+  local readonly arg_value="$2"
+
+  if [[ -z "$arg_value" ]]; then
+    log_error "The value for '$arg_name' cannot be empty"
+    print_usage
+    exit 1
+  fi
+}
+
+# =============================================================================
+
+function generate_nginx_config_for_nomad {
+  local readonly server_name="$1"
+  cat > "$NGINX_CONF_FILE" <<EOF
+user nginx;
+worker_processes  auto;
+
+error_log  /var/log/nginx/error.log warn;
+pid        /var/run/nginx.pid;
+
+events {
+  worker_connections 1024;
+  use epoll;
+}
+
+http {
+  include       /etc/nginx/mime.types;
+  default_type  application/octet-stream;
+  gzip          on;
+
+  access_log    /var/log/nginx/access.log;
+
+  proxy_set_header Host \$http_host;
+  proxy_set_header X-Real-IP \$remote_addr;
+  proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+  proxy_set_header X-Forwarded-Proto \$scheme;
+
+  # As a WebSocket Proxy
+  proxy_http_version 1.1;
+  proxy_set_header Connection "Upgrade";
+  proxy_set_header Upgrade \$http_upgrade;
+
+  # Nomad blocking queries have wait time defaults to 5min (300s)
+  proxy_read_timeout 360s;
+  proxy_buffering off;
+
+  keepalive_timeout  60s;
+  keepalive_requests 1000;
+
+  client_max_body_size 0;
+
+  # ssl-cert package
+  ssl_certificate     /etc/ssl/certs/ssl-cert-snakeoil.pem;
+  ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
+
+  ssl_protocols               TLSv1.2 TLSv1.3;
+  ssl_prefer_server_ciphers   on;
+  ssl_ciphers                 ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384;
+  ssl_ecdh_curve              secp384r1; # Requires nginx >= 1.1.0
+
+  ssl_session_cache   shared:SSL:10m;
+  ssl_session_tickets off; # Requires nginx >= 1.5.9
+
+  ssl_stapling        off; # Requires nginx >= 1.3.7
+  ssl_stapling_verify off; # Requires nginx => 1.3.7
+
+  # Return 404 for unrecognized server names
+  # https://nginx.org/en/docs/http/request_processing.html
+  server {
+    listen 443 default_server ssl http2;
+    return 404;
+  }
+
+  upstream nomad {
+    server 127.0.0.1:4646;
+    keepalive 32;
+  }
+
+  server {
+    listen        443 ssl http2;
+    server_name   ${server_name};
+    location / {
+      proxy_pass  http://nomad;
+    }
+  }
+}
+EOF
+}
+
+function generate_nginx_config {
+  local readonly upstream="$1"
+  local readonly server_name="$2"
+
+  case "$upstream" in
+    nomad)
+      generate_nginx_config_for_nomad "$server_name"
+      ;;
+    *)
+      log_error "Unsupported upstream: $upstream"
+      exit 1
+      ;;
+  esac
+}
+
+function start_nginx {
+  systemctl enable nginx.service
+  systemctl start nginx.service
+}
+
+# =============================================================================
+
+function run {
+  local upstream=""
+  local server_name=""
+
+  while [[ $# > 0 ]]; do
+    local key="$1"
+
+    case "$key" in
+      --upstream)
+        upstream="$2"
+        shift
+        ;;
+      --server-name)
+        server_name="$2"
+        shift
+        ;;
+      --help)
+        print_usage
+        exit
+        ;;
+      *)
+        log_error "Unrecognized argument: $key"
+        print_usage
+        exit 1
+        ;;
+    esac
+
+    shift
+  done
+
+  assert_not_empty "--upstream" "$upstream"
+  assert_not_empty "--server-name" "$server_name"
+
+  log_info "Start configuring nginx for $upstream"
+
+  generate_nginx_config "$upstream" "$server_name"
+  start_nginx
+
+  log_info "Nginx for $upstream is now running!"
+}
+
+run "$@"

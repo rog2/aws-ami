@@ -121,6 +121,19 @@ build {
     ]
   }
 
+  provisioner "file" {
+    source      = "provisioners/shell/nginx"
+    destination = "/tmp/"
+  }
+
+  provisioner "shell" {
+    inline = [
+      "cd /tmp/nginx",
+      "chmod +x install-nginx",
+      "./install-nginx --repo stable",
+    ]
+  }
+
   provisioner "shell" {
     inline = [
       "echo 'Validating provisioners...'",
@@ -131,6 +144,7 @@ build {
       "docker-credential-ecr-login -v",
       "consul --version",
       "nomad --version",
+      "nginx -V",
     ]
   }
 

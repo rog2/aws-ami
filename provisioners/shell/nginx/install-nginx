@@ -1,0 +1,140 @@
+#!/bin/bash
+
+# Instructions from
+# https://nginx.org/en/linux_packages.html
+
+set -e
+
+# =============================================================================
+
+readonly APT_SOURCE_FILE='/etc/apt/sources.list.d/nginx.list'
+
+readonly SCRIPT_INSTALL_DIR="/opt/nginx/bin"
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly SCRIPT_NAME="$(basename "$0")"
+
+# =============================================================================
+
+function print_usage {
+  echo
+  echo "Usage: install-nginx [OPTIONS]"
+  echo
+  echo "This script can be used to install Nginx on AWS EC2."
+  echo
+  echo "Options:"
+  echo
+  echo -e "  --repo\tOptionally select the nginx repository to use. Can be \"stable\" or \"mainline\". Defaults to \"stable\"."
+  echo
+  echo "Example:"
+  echo
+  echo "  install-nginx --repo mainline"
+}
+
+function log {
+  local readonly level="$1"
+  local readonly message="$2"
+  local readonly timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+  >&2 echo -e "${timestamp} [${level}] [$SCRIPT_NAME] ${message}"
+}
+
+function log_info {
+  local readonly message="$1"
+  log "INFO" "$message"
+}
+
+function log_error {
+  local readonly message="$1"
+  log "ERROR" "$message"
+}
+
+function assert_not_empty {
+  local readonly arg_name="$1"
+  local readonly arg_value="$2"
+
+  if [[ -z "$arg_value" ]]; then
+    log_error "The value for '$arg_name' cannot be empty"
+    print_usage
+    exit 1
+  fi
+}
+
+# =============================================================================
+
+function install_nginx {
+  local readonly repo="$1"
+  local readonly arch=$(dpkg --print-architecture)
+  local readonly codename=$(lsb_release -cs)
+
+  local repo_url="https://nginx.org/packages/ubuntu" # stable
+  if [[ "$repo" == "mainline" ]]; then
+    repo_url="https://nginx.org/packages/mainline/ubuntu"
+  fi
+
+  log_info "Add Nginx's official signing key"
+  curl -fsSL https://nginx.org/keys/nginx_signing.key | sudo APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1 apt-key add -
+
+  log_info "Add Nginx's apt repository ($repo)"
+  echo "deb [arch=${arch}] ${repo_url} ${codename} nginx" | sudo tee "$APT_SOURCE_FILE"
+
+  log_info 'Verify apt-key fingerprint'
+  APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1 apt-key fingerprint ABF5BD827BD9BF62
+
+  log_info 'apt-get update'
+  sudo apt-get update
+
+  log_info "Installing nginx"
+  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q nginx
+}
+
+function stop_and_disable_nginx_service {
+  log_info 'Stop and disable nginx.service'
+  sudo systemctl stop nginx.service
+  sudo systemctl disable nginx.service
+}
+
+function copy_nginx_run_script {
+  log_info "Copying Nginx run script to $SCRIPT_INSTALL_DIR"
+  sudo mkdir -p "$SCRIPT_INSTALL_DIR"
+  sudo install -v -m 744 "$SCRIPT_DIR/run-nginx" "$SCRIPT_INSTALL_DIR"
+}
+
+# =============================================================================
+
+function install {
+  local repo="stable"
+
+  while [[ $# > 0 ]]; do
+    local key="$1"
+
+    case "$key" in
+      --repo)
+        repo="$2"
+        shift
+        ;;
+      --help)
+        print_usage
+        exit
+        ;;
+      *)
+        log_error "Unrecognized argument: $key"
+        print_usage
+        exit 1
+        ;;
+    esac
+
+    shift
+  done
+
+  assert_not_empty "--repo" "$repo"
+
+  log_info "Start installing nginx ($repo)"
+
+  install_nginx "$repo"
+  stop_and_disable_nginx_service
+  copy_nginx_run_script
+
+  log_info "Nginx ($repo) install complete!"
+}
+
+install "$@"
