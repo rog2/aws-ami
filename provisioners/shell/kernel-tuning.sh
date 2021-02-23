@@ -2,7 +2,7 @@
 
 set -e
 
-readonly SYSCTL_CONF="/etc/sysctl.d/98-seasungames-kernel-tuning.conf"
+readonly SYSCTL_CONF="/etc/sysctl.d/98-kingsoftgames-kernel-tuning.conf"
 
 sudo tee "$SYSCTL_CONF" <<EOF
 # Disable virtual memory
