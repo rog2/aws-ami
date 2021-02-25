@@ -123,7 +123,7 @@ function get_instance_id {
 }
 
 function get_instance_region {
-  lookup_path_in_instance_dynamic_data "instance-identity/document" | jq -r ".region"
+  lookup_path_in_instance_metadata "placement/region"
 }
 
 function get_instance_tags {
