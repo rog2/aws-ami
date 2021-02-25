@@ -8,7 +8,7 @@ build {
   ]
 
   provisioner "file" {
-    source      = "provisioners/shell/bash-helpers.sh"
+    source      = "provisioners/bash-helpers.sh"
     destination = "/tmp/"
   }
 
@@ -20,23 +20,23 @@ build {
       "NODE_EXPORTER_VERSION=${local.node_exporter_version}",
     ]
     scripts = [
-      "provisioners/shell/apt-mirrors.sh",
-      "provisioners/shell/apt-upgrade.sh",
-      "provisioners/shell/apt-daily.sh",
-      "provisioners/shell/apt-packages.sh",
-      "provisioners/shell/journald-conf.sh",
-      "provisioners/shell/core-pattern.sh",
-      "provisioners/shell/kernel-tuning.sh",
-      "provisioners/shell/chrony.sh",
-      "provisioners/shell/timezone.sh",
-      "provisioners/shell/awscliv2.sh",
-      "provisioners/shell/java-amazon-corretto.sh",
-      "provisioners/shell/prometheus/node-exporter.sh",
+      "provisioners/apt-mirrors.sh",
+      "provisioners/apt-upgrade.sh",
+      "provisioners/apt-daily.sh",
+      "provisioners/apt-packages.sh",
+      "provisioners/journald-conf.sh",
+      "provisioners/core-pattern.sh",
+      "provisioners/kernel-tuning.sh",
+      "provisioners/chrony.sh",
+      "provisioners/timezone.sh",
+      "provisioners/awscliv2.sh",
+      "provisioners/java-amazon-corretto.sh",
+      "provisioners/prometheus/node-exporter.sh",
     ]
   }
 
   provisioner "file" {
-    source      = "provisioners/shell/cloud-init/mount-nvme-instance-store"
+    source      = "provisioners/cloud-init/mount-nvme-instance-store"
     destination = "/tmp/"
   }
 
@@ -48,7 +48,7 @@ build {
   }
 
   provisioner "file" {
-    source      = "provisioners/shell/ebs"
+    source      = "provisioners/ebs"
     destination = "/tmp/"
   }
 
@@ -62,7 +62,7 @@ build {
   }
 
   provisioner "file" {
-    source      = "provisioners/shell/docker"
+    source      = "provisioners/docker"
     destination = "/tmp/"
   }
 
@@ -97,7 +97,7 @@ build {
 
   provisioner "file" {
     destination = "/tmp/"
-    source      = "provisioners/shell/consul"
+    source      = "provisioners/consul"
   }
 
   provisioner "shell" {
@@ -109,7 +109,7 @@ build {
   }
 
   provisioner "file" {
-    source      = "provisioners/shell/nomad"
+    source      = "provisioners/nomad"
     destination = "/tmp/"
   }
 
@@ -122,7 +122,7 @@ build {
   }
 
   provisioner "file" {
-    source      = "provisioners/shell/nginx"
+    source      = "provisioners/nginx"
     destination = "/tmp/"
   }
 
