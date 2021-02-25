@@ -4,7 +4,7 @@ locals {
 
   # software versions
   java_version           = "11.0.10.9-1"
-  node_exporter_version  = "1.0.1"
+  node_exporter_version  = "1.1.1"
   docker_version         = "20.10.3"
   docker_compose_version = "1.28.2"
   ecr_helper_version     = "0.4.0"
