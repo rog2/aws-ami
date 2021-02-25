@@ -22,8 +22,8 @@ build {
     scripts = [
       "provisioners/shell/apt-mirrors.sh",
       "provisioners/shell/apt-upgrade.sh",
-      "provisioners/shell/apt-daily-conf.sh",
-      "provisioners/shell/packages.sh",
+      "provisioners/shell/apt-daily.sh",
+      "provisioners/shell/apt-packages.sh",
       "provisioners/shell/journald-conf.sh",
       "provisioners/shell/core-pattern.sh",
       "provisioners/shell/kernel-tuning.sh",
