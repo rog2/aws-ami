@@ -2,7 +2,6 @@ build {
   description = "Linux golden image based on Ubuntu Server LTS."
 
   sources = [
-    "source.amazon-ebs.bionic-amd64",
     "source.amazon-ebs.focal-amd64",
     "source.amazon-ebs.focal-arm64",
   ]
@@ -81,7 +80,6 @@ build {
   provisioner "shell" {
     # docker-compose only supports amd64
     only = [
-      "source.amazon-ebs.bionic-amd64",
       "source.amazon-ebs.focal-amd64",
     ]
     environment_vars = [
