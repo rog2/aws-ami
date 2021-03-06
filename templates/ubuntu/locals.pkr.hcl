@@ -16,7 +16,7 @@ locals {
 
   # AMI names for OS releases/architectures
   ami_names = {
-    focal_amd64  = "ubuntu/20.04/amd64/${local.timestamp}"
+    focal_amd64  = "ubuntu/20.04/x86_64/${local.timestamp}"
     focal_arm64  = "ubuntu/20.04/arm64/${local.timestamp}"
   }
 }

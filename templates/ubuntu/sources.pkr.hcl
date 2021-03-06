@@ -12,7 +12,7 @@ source "amazon-ebs" "focal-amd64" {
   region          = var.region
   ami_regions     = var.regions_to_copy
   ami_users       = var.users_to_share
-  ami_description = "Linux golden image based on Ubuntu 20.04 (amd64)"
+  ami_description = "Linux golden image based on Ubuntu 20.04 (x86_64)"
   ami_name        = local.ami_names.focal_amd64
 
   subnet_id                   = var.subnet_id
@@ -35,7 +35,7 @@ source "amazon-ebs" "focal-amd64" {
     node_exporter_version  = local.node_exporter_version
     consul_version         = local.consul_version
     nomad_version          = local.nomad_version
-    os_arch                = "amd64"
+    os_arch                = "x86_64"
     os_name                = "Ubuntu"
     os_version             = "20.04"
     source_ami             = "{{ .SourceAMI }}"
