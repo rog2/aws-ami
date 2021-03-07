@@ -61,7 +61,7 @@ function http_download {
   if [[ $az != cn-* ]]; then
     curl -o "$local_path" "$url" --location --silent --fail --show-error
   else
-    local readonly s3_uri="s3://dl.seasungames.com/${url#https://}"
+    local readonly s3_uri="s3://shiyou-mirror/${url#https://}"
     aws s3 cp "$s3_uri" "$local_path" --region cn-north-1
   fi
 }
