@@ -41,7 +41,7 @@ function generate_docker_config {
 {
   "log-driver": "json-file",
   "log-opts": {
-    "env": "NOMAD_JOB_NAME,NOMAD_GROUP_NAME,NOMAD_TASK_NAME,NOMAD_ALLOC_ID"
+    "env": "NOMAD_NAMESPACE,NOMAD_JOB_NAME,NOMAD_GROUP_NAME,NOMAD_TASK_NAME,NOMAD_ALLOC_ID"
   }
 }
 EOF
