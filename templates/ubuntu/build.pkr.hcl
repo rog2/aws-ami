@@ -79,8 +79,9 @@ build {
 
   provisioner "shell" {
     # docker-compose only supports amd64
+    # https://www.packer.io/docs/templates/hcl_templates/blocks/build/provisioner#run-on-specific-builds
     only = [
-      "source.amazon-ebs.focal-amd64",
+      "amazon-ebs.focal-amd64",
     ]
     environment_vars = [
       "BASH_HELPERS=/tmp/bash-helpers.sh",
