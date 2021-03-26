@@ -188,7 +188,16 @@ function generate_nomad_config {
 
   local server_config=""
   if [[ "$server" == "true" ]]; then
+    # Increase http_max_conns_per_client to 1000 (defaults to 100)
+    # https://www.nomadproject.io/docs/configuration#http_max_conns_per_client
+    # This workarounds error from Nginx when many Nomad Web UI is open
+    # (most of TCP connections to Nomad HTTP API are caused by blocking query from Web UI)
+    # recv() failed (104: Connection reset by peer) while reading response header from upstream
     server_config=$(cat <<EOF
+limits {
+  http_max_conns_per_client = 1000
+}
+
 server {
   enabled = true
   raft_protocol = 3
