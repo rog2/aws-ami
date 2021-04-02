@@ -1,4 +1,4 @@
-source "amazon-ebs" "focal-amd64" {
+source "amazon-ebs" "focal_amd64" {
   source_ami_filter {
     filters = {
       name                = "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"
@@ -44,7 +44,7 @@ source "amazon-ebs" "focal-amd64" {
   }
 }
 
-source "amazon-ebs" "focal-arm64" {
+source "amazon-ebs" "focal_arm64" {
   source_ami_filter {
     filters = {
       name                = "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-arm64-server-*"

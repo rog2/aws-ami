@@ -2,8 +2,8 @@ build {
   description = "Linux golden image based on Ubuntu Server LTS."
 
   sources = [
-    "source.amazon-ebs.focal-amd64",
-    "source.amazon-ebs.focal-arm64",
+    "source.amazon-ebs.focal_amd64",
+    "source.amazon-ebs.focal_arm64",
   ]
 
   provisioner "file" {
@@ -81,7 +81,7 @@ build {
     # docker-compose only supports amd64
     # https://www.packer.io/docs/templates/hcl_templates/blocks/build/provisioner#run-on-specific-builds
     only = [
-      "amazon-ebs.focal-amd64",
+      "amazon-ebs.focal_amd64",
     ]
     environment_vars = [
       "BASH_HELPERS=/tmp/bash-helpers.sh",
@@ -147,5 +147,12 @@ build {
     ]
   }
 
-  post-processor "manifest" {}
+  # https://www.packer.io/docs/post-processors/manifest
+  # https://www.packer.io/docs/templates/hcl_templates/contextual-variables#source-variables
+  post-processor "manifest" {
+    custom_data = {
+      region     = var.region
+      image_name = local.ami_names[source.name]
+    }
+  }
 }
