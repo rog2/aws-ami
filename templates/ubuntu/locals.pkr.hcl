@@ -3,7 +3,7 @@ locals {
   timestamp = regex_replace(timestamp(), "[- :]", "")
 
   # software versions
-  java_version           = "11.0.10.9-1"
+  java_version           = "11.0.11.9-1"
   node_exporter_version  = "1.1.2"
   docker_version         = "20.10.6"
   docker_compose_version = "1.29.1"
