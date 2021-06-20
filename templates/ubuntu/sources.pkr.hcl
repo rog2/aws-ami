@@ -1,11 +1,11 @@
 # Ubuntu use rolling kernels by default
-# After version 20210518, Ubuntu 20.04 AMIs moved to kernel 5.8
-# We want to stay on 5.4 LTS kernel, so here we are pinning to 20210518
+# After version 202105, Ubuntu 20.04 AMIs moved to kernel 5.8
+# We want to stay on 5.4 LTS kernel, so here we are pinning to 202105
 # See provisioners/apt-kernel.sh
 source "amazon-ebs" "focal_amd64" {
   source_ami_filter {
     filters = {
-      name                = "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20210518"
+      name                = "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-202105*"
       root-device-type    = "ebs"
       virtualization-type = "hvm"
     }
@@ -48,11 +48,11 @@ source "amazon-ebs" "focal_amd64" {
   }
 }
 
-# Same as amd64, we want to stay on 5.4 LTS kernel, so here we are pinning to 20210518
+# Same as amd64, we want to stay on 5.4 LTS kernel, so here we are pinning to 202105
 source "amazon-ebs" "focal_arm64" {
   source_ami_filter {
     filters = {
-      name                = "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-arm64-server-20210518"
+      name                = "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-arm64-server-202105*"
       root-device-type    = "ebs"
       virtualization-type = "hvm"
     }
