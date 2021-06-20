@@ -20,6 +20,7 @@ build {
     ]
     scripts = [
       "provisioners/apt-mirrors.sh",
+      "provisioners/apt-kernel.sh",
       "provisioners/apt-upgrade.sh",
       "provisioners/apt-daily.sh",
       "provisioners/apt-packages.sh",

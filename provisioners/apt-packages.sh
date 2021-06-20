@@ -6,7 +6,6 @@ sudo apt-get update
 
 # Common packages across all versions
 DEPS="
-  linux-tools-aws
   net-tools
   ssl-cert
   nvme-cli
