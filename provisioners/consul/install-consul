@@ -201,17 +201,6 @@ WantedBy=multi-user.target
 EOF
 }
 
-# Ask systemd-resolved to forward 'consul' domain queries to localhost consul.service
-# See: https://www.consul.io/docs/guides/forwarding.html#systemd-resolved-setup
-function setup_systemd_resolved {
-  sudo mkdir -p /etc/systemd/resolved.conf.d
-  sudo tee /etc/systemd/resolved.conf.d/consul.conf << EOF
-[Resolve]
-DNS=127.0.0.1
-Domains=~consul
-EOF
-}
-
 # =============================================================================
 
 function install {
@@ -251,8 +240,6 @@ function install {
   fetch_consul_binary "$version"
   install_consul_binary "$path" "$user"
   install_consul_service  "$path" "$user"
-
-  setup_systemd_resolved
 
   if command -v consul; then
     log_info "Consul install complete!"

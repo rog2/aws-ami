@@ -293,6 +293,18 @@ function start_consul {
   systemctl start consul.service
 }
 
+# Ask systemd-resolved to forward 'consul' domain queries to localhost consul.service
+# See: https://www.consul.io/docs/guides/forwarding.html#systemd-resolved-setup
+function setup_systemd_resolved {
+  mkdir -p /etc/systemd/resolved.conf.d
+  tee /etc/systemd/resolved.conf.d/consul.conf << EOF
+[Resolve]
+DNS=127.0.0.1
+Domains=~consul
+EOF
+  systemctl restart systemd-resolved.service
+}
+
 # =============================================================================
 
 function run {
@@ -367,6 +379,8 @@ function run {
     "$datacenter"
 
   start_consul
+
+  setup_systemd_resolved
 }
 
 run "$@"
