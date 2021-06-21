@@ -53,3 +53,9 @@ variable "timezone" {
   type        = string
   default     = "Asia/Shanghai"
 }
+
+variable "git_commit" {
+  description = "The commit of the Git repository that AMIs are built with."
+  type        = string
+  default     = "N/A"
+}

@@ -45,6 +45,7 @@ source "amazon-ebs" "focal_amd64" {
     source_ami             = "{{ .SourceAMI }}"
     source_ami_name        = "{{ .SourceAMIName }}"
     timezone               = var.timezone
+    git_commit             = var.git_commit
   }
 }
 
@@ -91,5 +92,6 @@ source "amazon-ebs" "focal_arm64" {
     source_ami             = "{{ .SourceAMI }}"
     source_ami_name        = "{{ .SourceAMIName }}"
     timezone               = var.timezone
+    git_commit             = var.git_commit
   }
 }
