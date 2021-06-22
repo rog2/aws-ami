@@ -15,7 +15,9 @@ net.core.somaxconn = 1024
 net.core.rmem_max = 16777216
 net.core.wmem_max = 16777216
 # port range used by TCP and UDP to choose the local port
-net.ipv4.ip_local_port_range = 1024 65535
+# note: Nomad allocate ports between 20000 and 32000
+# https://www.nomadproject.io/docs/install/production/requirements#ports-used
+net.ipv4.ip_local_port_range = 32001 65535
 EOF
 
 sudo sysctl -p "$SYSCTL_CONF"
