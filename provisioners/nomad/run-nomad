@@ -264,6 +264,13 @@ plugin "docker" {
     volumes {
       enabled = true
     }
+    logging {
+      type = "json-file"
+      config {
+        max-size = "256m"
+        max-file = "2"
+      }
+    }
   }
 }
 EOF
