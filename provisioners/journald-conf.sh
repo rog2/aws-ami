@@ -7,3 +7,10 @@ set -e
 sudo mkdir -p /var/log/journal/
 
 sudo systemd-tmpfiles --create --prefix /var/log/journal
+
+# Tell journal daemon should not forward log messages to the syslog daemon, which will lower disk usage
+sudo mkdir -p /etc/systemd/journald.conf.d/
+sudo tee /etc/systemd/journald.conf.d/10-no-forward-to-syslog.conf << EOF
+[Journal]
+ForwardToSyslog=no
+EOF
